@@ -472,6 +472,34 @@ h1 {
   box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px white;
 }
 
+.custom-color-wrapper {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.custom-color-wrapper:hover {
+  transform: scale(1.1);
+}
+
+.custom-color-wrapper.selected {
+  box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px white;
+}
+
+.custom-color-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
 .btn {
   padding: 0.75rem 1.25rem;
   border-radius: 8px;

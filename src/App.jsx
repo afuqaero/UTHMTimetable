@@ -16,7 +16,7 @@ const timeSlots = [
 const colors = [
   '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981',
   '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef',
-  '#f43f5e', '#64748b'
+  '#f43f5e'
 ];
 
 const sections = Array.from({ length: 20 }, (_, i) => `S${i + 1}`);
@@ -599,6 +599,18 @@ export default function App() {
                         onClick={() => setFormData({ ...formData, color: c })}
                       />
                     ))}
+
+                    <div
+                      className={`custom-color-wrapper ${!colors.includes(formData.color) ? 'selected' : ''}`}
+                      title="Pick a Custom Color"
+                    >
+                      <input
+                        type="color"
+                        className="custom-color-input"
+                        value={colors.includes(formData.color) ? '#ffffff' : formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
 
