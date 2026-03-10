@@ -660,19 +660,47 @@ h1 {
     flex-basis: 100% !important;
   }
 
+  /* Keep form-row side by side — don't force column */
   .form-row {
+    flex-direction: row;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Subject Name takes most space, Section compact beside it */
+  .form-row>.form-group:first-child {
+    flex: 3 1 0;
+    min-width: 0;
+  }
+
+  .form-row>.form-group:last-child {
+    flex: 1 1 70px;
+    min-width: 70px;
+  }
+
+  /* Session rows: Location/Lecturer stack on mobile since they're long */
+  .session-box .form-row {
     flex-direction: column;
     gap: 0;
   }
 
+  /* Session Type / Day / Start / End stay side by side */
+  .session-box .form-row.time-row {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .session-box .form-row.time-row .form-group {
+    flex: 1;
+    min-width: 0;
+  }
+
   .dropdown-container {
     flex: 1;
-    /* Match the stretch style on mobile */
   }
 
   .dropdown-container>.btn {
     width: 100%;
-    /* Force btn full width */
   }
 
   .dropdown-menu {
@@ -682,13 +710,12 @@ h1 {
 
   .modal-overlay {
     align-items: flex-end;
-    /* Slide to bottom on mobile */
     padding: 0;
   }
 
   .modal-content {
     margin: 0;
-    max-height: 85vh;
+    max-height: 90vh;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -704,7 +731,6 @@ h1 {
     padding: 1.25rem 1rem;
   }
 
-  /* Make mobile modal buttons slightly sleeker */
   .modal-footer .btn {
     padding: 0.6rem 0.8rem;
     font-size: 0.9rem;
@@ -713,9 +739,21 @@ h1 {
   }
 
   .session-box {
-    padding: 1rem;
+    padding: 0.85rem;
+  }
+
+  /* Compact color picker on mobile */
+  .color-picker {
+    gap: 0.4rem;
+  }
+
+  .color-option,
+  .custom-color-wrapper {
+    width: 28px;
+    height: 28px;
   }
 }
+
 
 @keyframes slideUp {
   to {

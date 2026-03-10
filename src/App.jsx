@@ -742,7 +742,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="form-row mt-2">
+                      <div className="form-row mt-2 time-row">
                         <div className="form-group" style={{ flex: 1 }}>
                           <label>Session Type</label>
                           <select
@@ -768,7 +768,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="form-row">
+                      <div className="form-row time-row">
                         <div className="form-group">
                           <label>Start Time</label>
                           <select
