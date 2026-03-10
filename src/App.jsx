@@ -91,6 +91,8 @@ export default function App() {
 
   const openNewSubjectModal = (defaultSession = null) => {
     setEditingId(null);
+    setSubjectSearch('');
+    setShowSubjectDropdown(false);
     setFormData({
       name: '',
       section: 'S1',
@@ -118,6 +120,8 @@ export default function App() {
   const handleSubjectClick = (e, subject) => {
     e.stopPropagation();
     setEditingId(subject.id);
+    setSubjectSearch('');
+    setShowSubjectDropdown(false);
     // Deep copy to prevent accidental mutations before save
     setFormData({
       ...subject,
@@ -602,10 +606,9 @@ export default function App() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="e.g. BIC21303 (Philosophy)"
+                        placeholder="Search or type subject name…"
                         value={formData.name}
                         onChange={handleNameChange}
-                        onFocus={() => setShowSubjectDropdown(true)}
                         required
                         autoFocus
                       />
