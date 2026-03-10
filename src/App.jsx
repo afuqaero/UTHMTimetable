@@ -445,7 +445,15 @@ export default function App() {
   const exportPNG = async () => {
     if (!gridRef.current) return;
     try {
-      const canvas = await html2canvas(gridRef.current, { scale: 2, backgroundColor: '#1e293b' }); // Panel bg
+      const grid = gridRef.current;
+      const canvas = await html2canvas(grid, {
+        scale: 2,
+        backgroundColor: '#1e293b',
+        useCORS: true,
+        width: grid.scrollWidth,
+        height: grid.scrollHeight,
+        windowWidth: grid.scrollWidth + 50, // Force wide viewport so grid doesn't squash
+      });
       const image = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = image;
@@ -459,7 +467,15 @@ export default function App() {
   const exportPDF = async () => {
     if (!gridRef.current) return;
     try {
-      const canvas = await html2canvas(gridRef.current, { scale: 2, backgroundColor: '#1e293b' });
+      const grid = gridRef.current;
+      const canvas = await html2canvas(grid, {
+        scale: 2,
+        backgroundColor: '#1e293b',
+        useCORS: true,
+        width: grid.scrollWidth,
+        height: grid.scrollHeight,
+        windowWidth: grid.scrollWidth + 50, // Force wide viewport so grid doesn't squash
+      });
       const imgData = canvas.toDataURL("image/png");
 
       // Create the PDF with the exact dimensions of the image canvas to prevent whitespace
