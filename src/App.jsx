@@ -188,6 +188,7 @@ export default function App() {
   const handleReset = () => {
     if (window.confirm("Are you sure you want to completely reset your timetable? This action cannot be undone.")) {
       setSubjects([]);
+      localStorage.removeItem('timetable_subjects_v2');
     }
   };
 
@@ -413,7 +414,12 @@ export default function App() {
         </div>
 
         <div className="header-actions">
-          <button className="btn btn-danger-outline" onClick={handleReset} title="Reset Timetable">
+          <button
+            type="button"
+            className="btn btn-danger-outline"
+            onClick={() => handleReset()}
+            title="Reset Timetable"
+          >
             <RefreshCcw size={18} />
             <span className="hide-on-mobile">Reset</span>
           </button>
