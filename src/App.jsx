@@ -399,7 +399,7 @@ export default function App() {
       const relativeY = touch.clientY - gridRect.top;
 
       // Header row height = 60px, Header col width = 135px
-      const colWidth = (gridRect.width - 135) / maxEndIndex;
+      const colWidth = (gridRect.width - 135) / 12;
       const rowHeight = (gridRect.height - 60) / 5;
 
       const colIndex = Math.floor((relativeX - 135) / colWidth);
@@ -440,19 +440,27 @@ export default function App() {
     setTouchState(null);
   };
 
+  const maxEndIndex = 12;
+
   // ----- Export Functions ----- //
 
   const exportPNG = async () => {
     if (!gridRef.current) return;
     try {
+      const exportMaxEndIndex = Math.max(
+        10, // At least show until 18:00 in export
+        ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
+      );
       const grid = gridRef.current;
+      const exportWidth = 135 + (exportMaxEndIndex * 110);
+
       const canvas = await html2canvas(grid, {
         scale: 2,
         backgroundColor: '#1e293b',
         useCORS: true,
-        width: grid.scrollWidth,
+        width: exportWidth,
         height: grid.scrollHeight,
-        windowWidth: grid.scrollWidth + 50, // Force wide viewport so grid doesn't squash
+        windowWidth: grid.scrollWidth + 50,
       });
       const image = canvas.toDataURL("image/png");
       const a = document.createElement("a");
@@ -467,14 +475,20 @@ export default function App() {
   const exportPDF = async () => {
     if (!gridRef.current) return;
     try {
+      const exportMaxEndIndex = Math.max(
+        10, // At least show until 18:00 in export
+        ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
+      );
       const grid = gridRef.current;
+      const exportWidth = 135 + (exportMaxEndIndex * 110);
+
       const canvas = await html2canvas(grid, {
         scale: 2,
         backgroundColor: '#1e293b',
         useCORS: true,
-        width: grid.scrollWidth,
+        width: exportWidth,
         height: grid.scrollHeight,
-        windowWidth: grid.scrollWidth + 50, // Force wide viewport so grid doesn't squash
+        windowWidth: grid.scrollWidth + 50,
       });
       const imgData = canvas.toDataURL("image/png");
 
@@ -545,10 +559,6 @@ export default function App() {
     URL.revokeObjectURL(u);
   };
 
-  const maxEndIndex = Math.max(
-    10, // At least show until 18:00
-    ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
-  );
 
   return (
     <div className="app-container">
@@ -603,12 +613,12 @@ export default function App() {
       </header>
 
       <main className="timetable-wrapper">
-        <div className="timetable-grid" ref={gridRef} style={{ '--cols': maxEndIndex }}>
+        <div className="timetable-grid" ref={gridRef} style={{ '--cols': 12 }}>
           {/* Top Header Row */}
           <div className="header-cell" style={{ gridColumn: 1, gridRow: 1 }}>
             Day \ Time
           </div>
-          {timeSlots.slice(0, maxEndIndex).map((time, i) => (
+          {timeSlots.map((time, i) => (
             <div key={`header-${i}`} className="header-cell" style={{ gridColumn: i + 2, gridRow: 1 }}>
               {time}
             </div>
@@ -624,7 +634,7 @@ export default function App() {
                 {day}
               </div>
 
-              {timeSlots.slice(0, maxEndIndex).map((_, tIdx) => (
+              {timeSlots.map((_, tIdx) => (
                 <div
                   key={`cell-${day}-${tIdx}`}
                   className="grid-cell"
