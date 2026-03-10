@@ -595,8 +595,10 @@ export default function App() {
   return (
     <div className="app-container">
       <header>
-        <div>
-          <h1>UTHM Timetable Planner</h1>
+        <div className="header-info">
+          <a href="/" style={{ textDecoration: 'none' }}>
+            <h1>UTHM Timetable Planner</h1>
+          </a>
           <p className="header-subtitle">Click anywhere on the grid to add subject. Drag to move, or pull the sides to resize.</p>
           <p className="header-subtitle" style={{ marginTop: '4px', fontWeight: '500', color: 'var(--text-muted)' }}>by <a href="https://www.threads.net/@feeq_azmir" target="_blank" rel="noopener noreferrer" className="creator-link">feeq</a></p>
         </div>
