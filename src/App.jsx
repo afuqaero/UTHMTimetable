@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw } from 'lucide-react';
+import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search } from 'lucide-react';
+import subjectList from './data/subjects.json';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import './index.css';
@@ -64,6 +65,11 @@ export default function App() {
     sessions: [] // { id, day, startIndex, endIndex, location, lecturer }
   });
 
+  // Searchable subjects state
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
+  const [subjectSearch, setSubjectSearch] = useState('');
+  const dropdownRef = useRef(null);
+
   // Save changes
   useEffect(() => {
     localStorage.setItem('timetable_subjects_v2', JSON.stringify(subjects));
@@ -74,6 +80,9 @@ export default function App() {
     const handleClickOutside = (e) => {
       if (!e.target.closest('.dropdown-container')) {
         setExportMenuOpen(false);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target) && !e.target.closest('.search-input-wrapper')) {
+        setShowSubjectDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -119,6 +128,8 @@ export default function App() {
 
   const handleNameChange = (e) => {
     const newName = e.target.value;
+    setSubjectSearch(newName);
+    setShowSubjectDropdown(true);
     setFormData(prev => {
       // Auto-sync color if name exactly matches another existing subject
       const existing = subjects.find(s => s.name.toLowerCase() === newName.toLowerCase() && s.id !== editingId);
@@ -129,6 +140,23 @@ export default function App() {
       };
     });
   };
+
+  const selectSubject = (subjectName) => {
+    setFormData(prev => {
+      const existing = subjects.find(s => s.name.toLowerCase() === subjectName.toLowerCase() && s.id !== editingId);
+      return {
+        ...prev,
+        name: subjectName,
+        color: existing ? existing.color : prev.color
+      };
+    });
+    setSubjectSearch(subjectName);
+    setShowSubjectDropdown(false);
+  };
+
+  const filteredSubjects = subjectList.filter(s =>
+    s.toLowerCase().includes(subjectSearch.toLowerCase())
+  ).slice(0, 50); // Limit to 50 for performance
 
   const handleSessionChange = (index, field, value) => {
     const newSessions = [...formData.sessions];
@@ -568,17 +596,48 @@ export default function App() {
             <div className="modal-body">
               <form id="subject-form" onSubmit={handleSave}>
                 <div className="form-row">
-                  <div className="form-group" style={{ flex: 3 }}>
+                  <div className="form-group" style={{ flex: 3, position: 'relative' }}>
                     <label>Subject Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="e.g. BIC21303 (Philosophy)"
-                      value={formData.name}
-                      onChange={handleNameChange}
-                      required
-                      autoFocus
-                    />
+                    <div className="search-input-wrapper">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="e.g. BIC21303 (Philosophy)"
+                        value={formData.name}
+                        onChange={handleNameChange}
+                        onFocus={() => setShowSubjectDropdown(true)}
+                        required
+                        autoFocus
+                      />
+                      <Search className="search-icon" size={16} />
+                    </div>
+
+                    {showSubjectDropdown && subjectSearch && (
+                      <div className="subject-dropdown" ref={dropdownRef}>
+                        {/* Custom Entry Option */}
+                        <div
+                          className="subject-option custom-entry"
+                          onClick={() => setShowSubjectDropdown(false)}
+                        >
+                          <Plus size={14} className="mr-2" />
+                          Use custom: "{subjectSearch}"
+                        </div>
+
+                        {filteredSubjects.length > 0 ? (
+                          filteredSubjects.map((s, i) => (
+                            <div
+                              key={i}
+                              className="subject-option"
+                              onClick={() => selectSubject(s)}
+                            >
+                              {s}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="subject-no-results">No matches. Use custom name above.</div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group" style={{ flex: 1 }}>
