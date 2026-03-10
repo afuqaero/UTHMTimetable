@@ -58,6 +58,7 @@ export default function App() {
 
   // Form state
   const [editingId, setEditingId] = useState(null); // ID of subject being edited
+  const [touchState, setTouchState] = useState(null); // { type, subjectId, sessionIndex, startX, startY }
   const [formData, setFormData] = useState({
     name: '',
     section: 'S1',
@@ -318,33 +319,113 @@ export default function App() {
     if (!draggedItem) return;
 
     if (draggedItem.type === 'move') {
-      setSubjects(prevSubjects => prevSubjects.map(sub => {
-        if (sub.id === draggedItem.subjectId) {
-          const newSessions = [...sub.sessions];
-          const session = { ...newSessions[draggedItem.sessionIndex] };
-          const duration = session.endIndex - session.startIndex;
-
-          const grabOffset = draggedItem.grabOffset || 0;
-          let newStartIndex = targetTimeIndex - grabOffset;
-
-          // Boundaries check
-          if (newStartIndex < 0) newStartIndex = 0;
-          if (newStartIndex + duration > timeSlots.length) {
-            newStartIndex = timeSlots.length - duration;
-          }
-
-          session.day = targetDay;
-          session.startIndex = newStartIndex;
-          session.endIndex = newStartIndex + duration;
-
-          newSessions[draggedItem.sessionIndex] = session;
-          return { ...sub, sessions: newSessions };
-        }
-        return sub;
-      }));
+      performMove(draggedItem.subjectId, draggedItem.sessionIndex, targetDay, targetTimeIndex, draggedItem.grabOffset || 0);
     }
 
     setDraggedItem(null);
+  };
+
+  const performMove = (subjectId, sessionIndex, targetDay, targetTimeIndex, grabOffset) => {
+    setSubjects(prevSubjects => prevSubjects.map(sub => {
+      if (sub.id === subjectId) {
+        const newSessions = [...sub.sessions];
+        const session = { ...newSessions[sessionIndex] };
+        const duration = session.endIndex - session.startIndex;
+
+        let newStartIndex = targetTimeIndex - grabOffset;
+
+        // Boundaries check
+        if (newStartIndex < 0) newStartIndex = 0;
+        if (newStartIndex + duration > timeSlots.length) {
+          newStartIndex = timeSlots.length - duration;
+        }
+
+        session.day = targetDay;
+        session.startIndex = newStartIndex;
+        session.endIndex = newStartIndex + duration;
+
+        newSessions[sessionIndex] = session;
+        return { ...sub, sessions: newSessions };
+      }
+      return sub;
+    }));
+  };
+
+  // ----- Touch Handling for Mobile ----- //
+
+  const handleTouchStart = (e, subject, sessionIndex, type = 'move') => {
+    // Determine grabOffset if move
+    let grabOffset = 0;
+    if (type === 'move') {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const touch = e.touches[0];
+      const clickX = touch.clientX - rect.left;
+      const session = subject.sessions[sessionIndex];
+      const duration = session.endIndex - session.startIndex;
+      const cellWidth = rect.width / duration;
+      grabOffset = Math.floor(clickX / cellWidth);
+      if (grabOffset < 0) grabOffset = 0;
+      if (grabOffset >= duration) grabOffset = duration - 1;
+    }
+
+    setDraggedItem({ subjectId: subject.id, sessionIndex, type, grabOffset });
+    setTouchState({ type, subjectId: subject.id, sessionIndex, startX: e.touches[0].clientX, startY: e.touches[0].clientY });
+  };
+
+  const handleTouchMove = (e) => {
+    if (!draggedItem || !touchState) return;
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cell = element?.closest('.grid-cell');
+
+    if (cell) {
+      // Find what day/time it is from parents or attributes
+      // Simple way: check parent's position or classes
+      // But instead, we'll use coordinates to match the grid
+      const gridRect = gridRef.current.getBoundingClientRect();
+      const relativeX = touch.clientX - gridRect.left;
+      const relativeY = touch.clientY - gridRect.top;
+
+      // Header row height = 60px, Header col width = 135px
+      const colWidth = (gridRect.width - 135) / maxEndIndex;
+      const rowHeight = (gridRect.height - 60) / 5;
+
+      const colIndex = Math.floor((relativeX - 135) / colWidth);
+      const rowIndex = Math.floor((relativeY - 60) / rowHeight);
+
+      if (rowIndex >= 0 && rowIndex < 5 && colIndex >= 0 && colIndex < maxEndIndex) {
+        const targetDay = days[rowIndex];
+        const targetTimeIndex = colIndex;
+
+        if (draggedItem.type.startsWith('resize')) {
+          handleDragEnterCell(e, targetDay, targetTimeIndex);
+        }
+      }
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!draggedItem || !touchState) return;
+
+    if (draggedItem.type === 'move') {
+      const touch = e.changedTouches[0];
+      const gridRect = gridRef.current.getBoundingClientRect();
+      const relativeX = touch.clientX - gridRect.left;
+      const relativeY = touch.clientY - gridRect.top;
+
+      const colWidth = (gridRect.width - 135) / maxEndIndex;
+      const rowHeight = (gridRect.height - 60) / 5;
+
+      const colIndex = Math.floor((relativeX - 135) / colWidth);
+      const rowIndex = Math.floor((relativeY - 60) / rowHeight);
+
+      if (rowIndex >= 0 && rowIndex < 5 && colIndex >= 0 && colIndex < maxEndIndex) {
+        performMove(draggedItem.subjectId, draggedItem.sessionIndex, days[rowIndex], colIndex, draggedItem.grabOffset || 0);
+      }
+    }
+
+    setDraggedItem(null);
+    setTouchState(null);
   };
 
   // ----- Export Functions ----- //
@@ -488,7 +569,7 @@ export default function App() {
             onClick={() => openNewSubjectModal()}
           >
             <Plus size={18} />
-            Add Subject
+            <span className="hide-on-mobile">Add Subject</span>
           </button>
         </div>
       </header>
@@ -551,9 +632,12 @@ export default function App() {
                     gridRow: row,
                     backgroundColor: subject.color,
                     opacity: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type === 'move') ? 0.5 : 1,
-                    pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx) ? 'none' : 'auto'
+                    pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type.startsWith('resize')) ? 'none' : 'auto'
                   }}
                   onClick={(e) => handleSubjectClick(e, subject)}
+                  onTouchStart={(e) => handleTouchStart(e, subject, sIdx, 'move')}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 >
                   <div
                     className="resize-handle left"
@@ -561,6 +645,9 @@ export default function App() {
                     onDragStart={(e) => handleResizeStart(e, subject, sIdx, 'resize-left')}
                     onDragEnd={handleDragEnd}
                     onDrop={(e) => e.preventDefault()}
+                    onTouchStart={(e) => { e.stopPropagation(); handleTouchStart(e, subject, sIdx, 'resize-left'); }}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                   />
                   <div
                     className="resize-handle right"
@@ -568,6 +655,9 @@ export default function App() {
                     onDragStart={(e) => handleResizeStart(e, subject, sIdx, 'resize-right')}
                     onDragEnd={handleDragEnd}
                     onDrop={(e) => e.preventDefault()}
+                    onTouchStart={(e) => { e.stopPropagation(); handleTouchStart(e, subject, sIdx, 'resize-right'); }}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                   />
                   <div className="type-badge">{getShortType(session.type || 'Lecture')}</div>
                   <div className="subject-name">{subject.name}</div>

@@ -25,6 +25,11 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  /* Disable selection */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .app-container {
@@ -171,6 +176,8 @@ h1 {
   z-index: 2;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  touch-action: none;
+  /* Crucial for mobile dragging if using custom touch handlers */
 }
 
 .subject-item:active {
@@ -645,19 +652,37 @@ h1 {
     align-items: flex-start;
   }
 
-  .header-actions {
-    width: 100%;
-    justify-content: stretch;
+  .hide-on-mobile {
+    display: none;
   }
 
-  .header-actions>.btn {
-    flex: 1;
-    font-size: 0.85rem;
-    padding: 0.6rem 0.5rem;
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    /* Align actions to the right */
+    gap: 0.5rem;
+  }
+
+  .header-actions>.btn,
+  .header-actions .dropdown-container>.btn {
+    flex: none;
+    /* Reset flex-grow/shrink */
+    width: 44px;
+    /* Fixed width for icon buttons */
+    height: 44px;
+    /* Fixed height to make it square/circular */
+    padding: 0;
+    justify-content: center;
+    border-radius: 10px;
+    /* More rounded icons */
+  }
+
+  .header-actions .dropdown-container {
+    flex: none;
   }
 
   .add-subject-btn {
-    flex-basis: 100% !important;
+    flex-basis: auto !important;
   }
 
   /* Keep form-row side by side — don't force column */
@@ -751,6 +776,18 @@ h1 {
   .custom-color-wrapper {
     width: 28px;
     height: 28px;
+  }
+
+  /* Mobile-friendly handles */
+  .resize-handle {
+    opacity: 0.6;
+    width: 20px;
+    /* Larger hit area */
+  }
+
+  .resize-handle::after {
+    height: 24px;
+    width: 4px;
   }
 }
 
