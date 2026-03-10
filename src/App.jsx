@@ -598,7 +598,7 @@ export default function App() {
         <div>
           <h1>UTHM Timetable Planner</h1>
           <p className="header-subtitle">Click anywhere on the grid to add subject. Drag to move, or pull the sides to resize.</p>
-          <p className="header-subtitle" style={{ marginTop: '4px', fontWeight: '500', color: 'var(--accent)' }}>by feeq</p>
+          <p className="header-subtitle" style={{ marginTop: '4px', fontWeight: '500', color: 'var(--text-muted)' }}>by <a href="https://www.threads.net/@feeq_azmir" target="_blank" rel="noopener noreferrer" className="creator-link">feeq</a></p>
         </div>
 
         <div className="header-actions">
