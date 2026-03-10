@@ -99,10 +99,10 @@ h1 {
 /* The export element should have explicit styles to ensure html2canvas paints accurately */
 .timetable-grid {
   display: grid;
-  /* 1 day column + 12 time columns (0800 - 2000) */
-  grid-template-columns: 135px repeat(12, minmax(110px, 1fr));
+  /* 1 day column + dynamic time columns based on subjects (var --cols) */
+  grid-template-columns: 135px repeat(var(--cols, 12), minmax(110px, 1fr));
   grid-template-rows: 60px repeat(5, minmax(90px, auto));
-  min-width: 1250px;
+  min-width: calc(135px + (var(--cols, 12) * 110px));
   background-color: var(--panel-bg);
   border-radius: 8px;
   /* For nice export edges */

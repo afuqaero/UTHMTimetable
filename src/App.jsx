@@ -436,6 +436,11 @@ export default function App() {
     URL.revokeObjectURL(u);
   };
 
+  const maxEndIndex = Math.max(
+    10, // At least show until 18:00
+    ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
+  );
+
   return (
     <div className="app-container">
       <header>
@@ -489,12 +494,12 @@ export default function App() {
       </header>
 
       <main className="timetable-wrapper">
-        <div className="timetable-grid" ref={gridRef}>
+        <div className="timetable-grid" ref={gridRef} style={{ '--cols': maxEndIndex }}>
           {/* Top Header Row */}
           <div className="header-cell" style={{ gridColumn: 1, gridRow: 1 }}>
             Day \ Time
           </div>
-          {timeSlots.map((time, i) => (
+          {timeSlots.slice(0, maxEndIndex).map((time, i) => (
             <div key={`header-${i}`} className="header-cell" style={{ gridColumn: i + 2, gridRow: 1 }}>
               {time}
             </div>
@@ -510,7 +515,7 @@ export default function App() {
                 {day}
               </div>
 
-              {timeSlots.map((_, tIdx) => (
+              {timeSlots.slice(0, maxEndIndex).map((_, tIdx) => (
                 <div
                   key={`cell-${day}-${tIdx}`}
                   className="grid-cell"
