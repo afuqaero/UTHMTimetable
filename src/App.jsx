@@ -58,7 +58,7 @@ export default function App() {
 
   // Form state
   const [editingId, setEditingId] = useState(null); // ID of subject being edited
-  const [touchState, setTouchState] = useState(null); // { type, subjectId, sessionIndex, startX, startY }
+  const [touchState, setTouchState] = useState(null); // { type, subjectId, sessionIndex, startX, startY, currentX, currentY }
   const [formData, setFormData] = useState({
     name: '',
     section: 'S1',
@@ -369,12 +369,24 @@ export default function App() {
     }
 
     setDraggedItem({ subjectId: subject.id, sessionIndex, type, grabOffset });
-    setTouchState({ type, subjectId: subject.id, sessionIndex, startX: e.touches[0].clientX, startY: e.touches[0].clientY });
+    setTouchState({
+      type,
+      subjectId: subject.id,
+      sessionIndex,
+      startX: e.touches[0].clientX,
+      startY: e.touches[0].clientY,
+      currentX: e.touches[0].clientX,
+      currentY: e.touches[0].clientY
+    });
   };
 
   const handleTouchMove = (e) => {
     if (!draggedItem || !touchState) return;
     const touch = e.touches[0];
+
+    // Update touchState for visual follow
+    setTouchState(prev => ({ ...prev, currentX: touch.clientX, currentY: touch.clientY }));
+
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
     const cell = element?.closest('.grid-cell');
 
@@ -551,7 +563,7 @@ export default function App() {
             <button className="btn btn-secondary" onClick={() => setExportMenuOpen(!exportMenuOpen)}>
               <Download size={18} />
               <span className="hide-on-mobile">Export File</span>
-              <ChevronDown size={14} style={{ marginLeft: '4px' }} />
+              <ChevronDown size={14} className="hide-on-mobile" style={{ marginLeft: '4px' }} />
             </button>
             {exportMenuOpen && (
               <div className="dropdown-menu">
@@ -632,7 +644,13 @@ export default function App() {
                     gridRow: row,
                     backgroundColor: subject.color,
                     opacity: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type === 'move') ? 0.5 : 1,
-                    pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type.startsWith('resize')) ? 'none' : 'auto'
+                    pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type.startsWith('resize')) ? 'none' : 'auto',
+                    transform: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx && touchState.type === 'move')
+                      ? `translate(${touchState.currentX - touchState.startX}px, ${touchState.currentY - touchState.startY}px) scale(1.02)`
+                      : undefined,
+                    zIndex: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx) ? 1000 : 2,
+                    boxShadow: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx) ? '0 15px 30px rgba(0,0,0,0.5)' : undefined,
+                    transition: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx) ? 'none' : 'transform 0.2s, box-shadow 0.2s'
                   }}
                   onClick={(e) => handleSubjectClick(e, subject)}
                   onTouchStart={(e) => handleTouchStart(e, subject, sIdx, 'move')}
