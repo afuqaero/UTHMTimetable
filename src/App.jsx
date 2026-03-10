@@ -603,7 +603,15 @@ export default function App() {
                     <div
                       className={`custom-color-wrapper ${!colors.includes(formData.color) ? 'selected' : ''}`}
                       title="Pick a Custom Color"
+                      style={{
+                        background: !colors.includes(formData.color) ? formData.color : undefined
+                      }}
                     >
+                      {colors.includes(formData.color) && (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.8)', pointerEvents: 'none' }}>
+                          <Plus size={16} strokeWidth={3} />
+                        </div>
+                      )}
                       <input
                         type="color"
                         className="custom-color-input"
