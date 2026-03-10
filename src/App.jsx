@@ -444,23 +444,42 @@ export default function App() {
 
   // ----- Export Functions ----- //
 
+  const getExportMaxCol = () => Math.max(
+    10, // At least show until 18:00
+    ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
+  );
+
   const exportPNG = async () => {
     if (!gridRef.current) return;
     try {
-      const exportMaxEndIndex = Math.max(
-        10, // At least show until 18:00 in export
-        ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
-      );
-      const grid = gridRef.current;
-      const exportWidth = 135 + (exportMaxEndIndex * 110);
+      const maxCol = getExportMaxCol();
+      const exportWidth = 135 + (maxCol * 110);
 
-      const canvas = await html2canvas(grid, {
+      const canvas = await html2canvas(gridRef.current, {
         scale: 2,
         backgroundColor: '#1e293b',
         useCORS: true,
         width: exportWidth,
-        height: grid.scrollHeight,
-        windowWidth: grid.scrollWidth + 50,
+        windowWidth: 1600, // Force desktop width for capture
+        onclone: (clonedDoc) => {
+          const clonedGrid = clonedDoc.querySelector('.timetable-grid');
+          if (clonedGrid) {
+            clonedGrid.style.setProperty('--cols', maxCol);
+            clonedGrid.style.width = `${exportWidth}px`;
+            clonedGrid.style.minWidth = `${exportWidth}px`;
+
+            // Hide cells beyond maxCol
+            Array.from(clonedGrid.children).forEach(cell => {
+              const colStyle = cell.style.gridColumn;
+              if (colStyle) {
+                const colStart = parseInt(colStyle.split(' / ')[0], 10);
+                if (colStart > maxCol + 1) {
+                  cell.style.display = 'none';
+                }
+              }
+            });
+          }
+        }
       });
       const image = canvas.toDataURL("image/png");
       const a = document.createElement("a");
@@ -475,20 +494,33 @@ export default function App() {
   const exportPDF = async () => {
     if (!gridRef.current) return;
     try {
-      const exportMaxEndIndex = Math.max(
-        10, // At least show until 18:00 in export
-        ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
-      );
-      const grid = gridRef.current;
-      const exportWidth = 135 + (exportMaxEndIndex * 110);
+      const maxCol = getExportMaxCol();
+      const exportWidth = 135 + (maxCol * 110);
 
-      const canvas = await html2canvas(grid, {
+      const canvas = await html2canvas(gridRef.current, {
         scale: 2,
         backgroundColor: '#1e293b',
         useCORS: true,
         width: exportWidth,
-        height: grid.scrollHeight,
-        windowWidth: grid.scrollWidth + 50,
+        windowWidth: 1600,
+        onclone: (clonedDoc) => {
+          const clonedGrid = clonedDoc.querySelector('.timetable-grid');
+          if (clonedGrid) {
+            clonedGrid.style.setProperty('--cols', maxCol);
+            clonedGrid.style.width = `${exportWidth}px`;
+            clonedGrid.style.minWidth = `${exportWidth}px`;
+
+            Array.from(clonedGrid.children).forEach(cell => {
+              const colStyle = cell.style.gridColumn;
+              if (colStyle) {
+                const colStart = parseInt(colStyle.split(' / ')[0], 10);
+                if (colStart > maxCol + 1) {
+                  cell.style.display = 'none';
+                }
+              }
+            });
+          }
+        }
       });
       const imgData = canvas.toDataURL("image/png");
 
