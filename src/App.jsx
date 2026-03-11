@@ -3,6 +3,7 @@ import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, 
 import subjectList from './data/subjects.json';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { Link } from 'react-router-dom';
 import './index.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -618,9 +619,9 @@ export default function App() {
     <div className="app-container">
       <header>
         <div className="header-info">
-          <a href="/" style={{ textDecoration: 'none' }}>
+          <Link to="/" style={{ textDecoration: 'none' }}>
             <h1>UTHM Timetable Planner</h1>
-          </a>
+          </Link>
           <p className="header-subtitle">Click anywhere on the grid to add subject. Drag to move, or pull the sides to resize.</p>
           <p className="header-subtitle" style={{ marginTop: '4px', fontWeight: '500', color: 'var(--text-muted)' }}>by <a href="https://www.threads.net/@feeq_azmir" target="_blank" rel="noopener noreferrer" className="creator-link">feeq</a></p>
         </div>
