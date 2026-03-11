@@ -752,16 +752,20 @@ h1:hover {
   }
 
   .dropdown-container {
-    flex: 1;
+    flex: none;
   }
 
   .dropdown-container>.btn {
-    width: 100%;
+    width: 44px;
+    height: 44px;
   }
 
   .dropdown-menu {
-    left: 0;
+    left: auto;
     right: 0;
+    min-width: 180px;
+    /* Ensure enough width for text */
+    z-index: 100;
   }
 
   .modal-overlay {
