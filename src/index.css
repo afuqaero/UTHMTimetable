@@ -9,7 +9,7 @@
   --accent-hover: #2563eb;
   --danger: #ef4444;
   --danger-hover: #dc2626;
-  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', 'Poppins', system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -40,12 +40,19 @@ body {
 }
 
 header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
@@ -208,7 +215,7 @@ h1:hover {
 .subject-item {
   position: relative;
   margin: 4px;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -216,14 +223,13 @@ h1:hover {
   align-items: center;
   text-align: center;
   cursor: grab;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s, filter 0.2s;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   z-index: 2;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
   touch-action: none;
-  /* Crucial for mobile dragging if using custom touch handlers */
 }
 
 .subject-item:active {
@@ -273,8 +279,10 @@ h1:hover {
 }
 
 .subject-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  z-index: 10;
+  filter: brightness(1.1);
 }
 
 .type-badge {
@@ -311,6 +319,57 @@ h1:hover {
   font-size: 0.75rem;
   opacity: 0.9;
   line-height: 1.2;
+}
+
+/* Empty State Overlay */
+.empty-state-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  pointer-events: none; /* Allows clicks to pass through to the empty grid cells */
+  z-index: 1;
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+  transform: translateY(-20px);
+}
+
+.icon-wrapper {
+  background: rgba(59, 130, 246, 0.15);
+  padding: 1rem;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  color: #60a5fa;
+}
+
+.empty-state-content h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.empty-state-content p {
+  color: var(--text-muted);
+  max-width: 300px;
+  line-height: 1.5;
 }
 
 /* Modal */

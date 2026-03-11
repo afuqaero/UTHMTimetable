@@ -16,9 +16,9 @@ const timeSlots = [
 ];
 
 const colors = [
-  '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981',
-  '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef',
-  '#f43f5e'
+  '#FF595E', '#FF924C', '#FFCA3A', '#8AC926', '#1982C4',
+  '#4267AC', '#6A4C93', '#F15BB5', '#F43F5E', '#06B6D4',
+  '#10B981', '#D946EF'
 ];
 
 const sections = Array.from({ length: 50 }, (_, i) => `S${i + 1}`);
@@ -715,6 +715,18 @@ export default function App() {
           ))}
 
           {/* Subject Items Overlaid */}
+          {subjects.length === 0 && (
+            <div className="empty-state-overlay" style={{ gridColumn: '2 / -1', gridRow: '2 / -1' }}>
+              <div className="empty-state-content">
+                <div className="icon-wrapper">
+                  <Calendar size={40} className="empty-icon" />
+                </div>
+                <h3>Your Schedule is Empty</h3>
+                <p>Click anywhere on the grid or tap "Add Subject" to begin your master plan.</p>
+              </div>
+            </div>
+          )}
+
           {subjects.map(subject =>
             subject.sessions.map((session, sIdx) => {
               const dayIdx = days.indexOf(session.day);
