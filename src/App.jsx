@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search } from 'lucide-react';
 import subjectList from './data/subjects.json';
+import roomList from './data/rooms.json';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Link } from 'react-router-dom';
@@ -74,6 +75,10 @@ export default function App() {
   const [subjectSearch, setSubjectSearch] = useState('');
   const dropdownRef = useRef(null);
 
+  // Searchable locations state
+  const [activeLocationDropdown, setActiveLocationDropdown] = useState(null);
+  const locationDropdownRef = useRef(null);
+
   // Save changes
   useEffect(() => {
     localStorage.setItem('timetable_subjects_v2', JSON.stringify(subjects));
@@ -87,6 +92,9 @@ export default function App() {
       }
       if (dropdownRef.current && !dropdownRef.current.contains(e.target) && !e.target.closest('.search-input-wrapper')) {
         setShowSubjectDropdown(false);
+      }
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(e.target) && !e.target.closest('.location-input-wrapper')) {
+        setActiveLocationDropdown(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -949,15 +957,48 @@ export default function App() {
                       </div>
 
                       <div className="form-row mt-2">
-                        <div className="form-group">
+                        <div className="form-group location-input-wrapper" style={{ position: 'relative' }}>
                           <label>Location (Optional)</label>
                           <input
                             type="text"
                             className="form-control"
                             placeholder="e.g. Hall 1"
                             value={session.location}
-                            onChange={e => handleSessionChange(sIdx, 'location', e.target.value)}
+                            onFocus={() => setActiveLocationDropdown(sIdx)}
+                            onChange={(e) => {
+                              handleSessionChange(sIdx, 'location', e.target.value);
+                              setActiveLocationDropdown(sIdx);
+                            }}
                           />
+                          {activeLocationDropdown === sIdx && (
+                            <div className="custom-dropdown" ref={locationDropdownRef} style={{ maxHeight: '200px' }}>
+                              {roomList
+                                .filter(r => r.toLowerCase().includes(session.location.toLowerCase()))
+                                .slice(0, 30)
+                                .map((r, i) => (
+                                  <div
+                                    key={i}
+                                    className="subject-option"
+                                    onClick={() => {
+                                      handleSessionChange(sIdx, 'location', r);
+                                      setActiveLocationDropdown(null);
+                                    }}
+                                  >
+                                    <MapPin size={14} style={{ display: 'inline', marginRight: '6px', color: 'var(--text-muted)' }} />
+                                    {r}
+                                  </div>
+                                ))}
+                              {session.location && roomList.filter(r => r.toLowerCase().includes(session.location.toLowerCase())).length === 0 && (
+                                <div
+                                  className="subject-option custom-entry"
+                                  onClick={() => setActiveLocationDropdown(null)}
+                                >
+                                  <Plus size={14} className="mr-2" style={{ display: 'inline' }} />
+                                  Use custom: "{session.location}"
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="form-group">
                           <label>Lecturer (Optional)</label>
