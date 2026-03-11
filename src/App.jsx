@@ -20,7 +20,7 @@ const colors = [
   '#f43f5e'
 ];
 
-const sections = Array.from({ length: 20 }, (_, i) => `S${i + 1}`);
+const sections = Array.from({ length: 30 }, (_, i) => `S${i + 1}`);
 
 // ID Generator Helper
 const generateId = () => Math.random().toString(36).substr(2, 9);
