@@ -160,6 +160,7 @@ h1:hover {
   position: sticky;
   top: 0;
   z-index: 10;
+  transition: opacity 0.3s ease;
 }
 
 /* Day Cells */
@@ -175,6 +176,20 @@ h1:hover {
   position: sticky;
   left: 0;
   z-index: 5;
+  transition: opacity 0.3s ease;
+}
+
+.is-horizontally-scrolled .day-cell,
+.is-horizontally-scrolled .header-cell:first-child {
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Restore visibility on hover even when scrolled */
+.is-horizontally-scrolled .day-cell:hover,
+.is-horizontally-scrolled .header-cell:first-child:hover {
+  opacity: 0.9;
+  pointer-events: auto;
 }
 
 /* Grid Cells (Empty slots) */

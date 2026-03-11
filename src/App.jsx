@@ -54,6 +54,8 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const gridRef = useRef(null);
+  const wrapperRef = useRef(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [draggedItem, setDraggedItem] = useState(null);
 
   // Form state
@@ -88,6 +90,20 @@ export default function App() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle horizontal scroll to hide/fade day column
+  useEffect(() => {
+    const handleScroll = () => {
+      if (wrapperRef.current) {
+        setIsScrolled(wrapperRef.current.scrollLeft > 20);
+      }
+    };
+    const wrapper = wrapperRef.current;
+    if (wrapper) {
+      wrapper.addEventListener('scroll', handleScroll, { passive: true });
+    }
+    return () => wrapper?.removeEventListener('scroll', handleScroll);
   }, []);
 
   const openNewSubjectModal = (defaultSession = null) => {
@@ -462,6 +478,9 @@ export default function App() {
         width: exportWidth,
         windowWidth: 1600, // Force desktop width for capture
         onclone: (clonedDoc) => {
+          const clonedWrapper = clonedDoc.querySelector('.timetable-wrapper');
+          if (clonedWrapper) clonedWrapper.classList.remove('is-horizontally-scrolled');
+
           const clonedGrid = clonedDoc.querySelector('.timetable-grid');
           if (clonedGrid) {
             clonedGrid.style.setProperty('--cols', maxCol);
@@ -504,6 +523,9 @@ export default function App() {
         width: exportWidth,
         windowWidth: 1600,
         onclone: (clonedDoc) => {
+          const clonedWrapper = clonedDoc.querySelector('.timetable-wrapper');
+          if (clonedWrapper) clonedWrapper.classList.remove('is-horizontally-scrolled');
+
           const clonedGrid = clonedDoc.querySelector('.timetable-grid');
           if (clonedGrid) {
             clonedGrid.style.setProperty('--cols', maxCol);
@@ -646,7 +668,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="timetable-wrapper">
+      <main className={`timetable-wrapper ${isScrolled ? 'is-horizontally-scrolled' : ''}`} ref={wrapperRef}>
         <div className="timetable-grid" ref={gridRef} style={{ '--cols': 12 }}>
           {/* Top Header Row */}
           <div className="header-cell" style={{ gridColumn: 1, gridRow: 1 }}>
