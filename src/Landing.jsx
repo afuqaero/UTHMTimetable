@@ -34,7 +34,7 @@ export default function Landing() {
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
         >
           UTHM Timetable <br />
-          <span className="text-gradient">Planner 2.0</span>
+          <span className="text-gradient">Planner</span>
         </motion.h1>
 
         <motion.p 
