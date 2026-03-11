@@ -181,7 +181,7 @@ export default function App() {
   ).slice(0, 50); // Limit to 50 for performance
 
   const handleSessionChange = (index, field, value) => {
-    const newSessions = [...formData.sessions];
+    let newSessions = [...formData.sessions];
     newSessions[index] = { ...newSessions[index], [field]: value };
 
     // Auto adjust end time if start time is pushed past it
@@ -191,6 +191,15 @@ export default function App() {
         newSessions[index].endIndex = Math.min(start + 1, timeSlots.length);
       }
     }
+
+    // Auto-sync lecturer across all sessions
+    if (field === 'lecturer') {
+      newSessions = newSessions.map(session => ({
+        ...session,
+        lecturer: value
+      }));
+    }
+
     setFormData({ ...formData, sessions: newSessions });
   };
 

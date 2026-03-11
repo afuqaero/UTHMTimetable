@@ -439,6 +439,30 @@ h1:hover {
   font-size: 0.95rem;
   transition: border-color 0.2s;
   font-family: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 transparent;
+}
+
+.form-control::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.form-control::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.form-control::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
+}
+
+.form-control::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+select.form-control {
+  appearance: auto;
 }
 
 .form-control:focus {
