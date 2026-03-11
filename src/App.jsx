@@ -497,6 +497,12 @@ export default function App() {
             clonedGrid.style.width = `${exportWidth}px`;
             clonedGrid.style.minWidth = `${exportWidth}px`;
 
+            // Fix html2canvas box-shadow inset and border rendering bugs
+            Array.from(clonedGrid.querySelectorAll('.subject-item')).forEach(item => {
+              item.style.boxShadow = 'none';
+              item.style.border = 'none';
+            });
+
             // Hide cells beyond maxCol
             Array.from(clonedGrid.children).forEach(cell => {
               const colStyle = cell.style.gridColumn;
@@ -541,6 +547,12 @@ export default function App() {
             clonedGrid.style.setProperty('--cols', maxCol);
             clonedGrid.style.width = `${exportWidth}px`;
             clonedGrid.style.minWidth = `${exportWidth}px`;
+
+            // Fix html2canvas box-shadow inset and border rendering bugs
+            Array.from(clonedGrid.querySelectorAll('.subject-item')).forEach(item => {
+              item.style.boxShadow = 'none';
+              item.style.border = 'none';
+            });
 
             Array.from(clonedGrid.children).forEach(cell => {
               const colStyle = cell.style.gridColumn;
