@@ -975,7 +975,7 @@ select.form-control {
 }
 
 .subject-dropdown::-webkit-scrollbar {
-  display: none;
+  width: 6px;
 }
 
 .subject-option {
@@ -1029,7 +1029,7 @@ select.form-control {
 
 /* Custom Scrollbar for Dropdown */
 .subject-dropdown::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .subject-dropdown::-webkit-scrollbar-track {
@@ -1037,10 +1037,10 @@ select.form-control {
 }
 
 .subject-dropdown::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
 
 .subject-dropdown::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: rgba(255, 255, 255, 0.2);
 }
