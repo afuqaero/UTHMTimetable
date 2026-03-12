@@ -115,6 +115,21 @@ export default function App() {
     return () => wrapper?.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        setModalOpen(false);
+        setShowSubjectDropdown(false);
+        setActiveLocationDropdown(null);
+      }
+    };
+    if (modalOpen) {
+      window.addEventListener('keydown', handleEsc);
+    }
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [modalOpen]);
+
   const openNewSubjectModal = (defaultSession = null) => {
     setEditingId(null);
     setSubjectSearch('');
