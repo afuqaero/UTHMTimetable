@@ -9,11 +9,12 @@ import './index.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-// Timings: 0800 to 2000
+// Timings: 0800 to 0000
 const timeSlots = [
   '0800 - 0900', '0900 - 1000', '1000 - 1100', '1100 - 1200',
   '1200 - 1300', '1300 - 1400', '1400 - 1500', '1500 - 1600',
-  '1600 - 1700', '1700 - 1800', '1800 - 1900', '1900 - 2000'
+  '1600 - 1700', '1700 - 1800', '1800 - 1900', '1900 - 2000',
+  '2000 - 2100', '2100 - 2200', '2200 - 2300', '2300 - 0000'
 ];
 
 const colors = [
@@ -489,7 +490,7 @@ export default function App() {
     setTouchState(null);
   };
 
-  const maxEndIndex = 12;
+  const maxEndIndex = timeSlots.length;
 
   // ----- Export Functions ----- //
 
@@ -714,7 +715,7 @@ export default function App() {
       </header>
 
       <main className={`timetable-wrapper ${isScrolled ? 'is-horizontally-scrolled' : ''}`} ref={wrapperRef}>
-        <div className="timetable-grid" ref={gridRef} style={{ '--cols': 12 }}>
+        <div className="timetable-grid" ref={gridRef} style={{ '--cols': timeSlots.length }}>
           {/* Top Header Row */}
           <div className="header-cell" style={{ gridColumn: 1, gridRow: 1 }}>
             Day \ Time
