@@ -837,7 +837,7 @@ export default function App() {
             <div className="modal-body">
               <form id="subject-form" onSubmit={handleSave}>
                 <div className="form-row">
-                  <div className="form-group" style={{ flex: 3, position: 'relative' }}>
+                  <div className="form-group" style={{ flex: 3, position: 'relative', zIndex: showSubjectDropdown ? 100 : 1 }}>
                     <label>Subject Name</label>
                     <div className="search-input-wrapper">
                       <input
@@ -957,12 +957,12 @@ export default function App() {
                       </div>
 
                       <div className="form-row mt-2">
-                        <div className="form-group location-input-wrapper" style={{ position: 'relative' }}>
+                        <div className="form-group location-input-wrapper" style={{ position: 'relative', zIndex: activeLocationDropdown === sIdx ? 100 : 1 }}>
                           <label>Location (Optional)</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="e.g. Hall 1"
+                            placeholder="Search or type room name"
                             value={session.location}
                             onFocus={() => setActiveLocationDropdown(sIdx)}
                             onChange={(e) => {
@@ -971,7 +971,17 @@ export default function App() {
                             }}
                           />
                           {activeLocationDropdown === sIdx && (
-                            <div className="custom-dropdown" ref={locationDropdownRef} style={{ maxHeight: '200px' }}>
+                            <div className="custom-dropdown subject-dropdown" ref={locationDropdownRef} style={{ maxHeight: '160px' }}>
+                              {session.location && (
+                                <div
+                                  className="subject-option custom-entry"
+                                  onClick={() => setActiveLocationDropdown(null)}
+                                >
+                                  <Plus size={14} className="mr-2" style={{ display: 'inline' }} />
+                                  Use custom: "{session.location}"
+                                </div>
+                              )}
+
                               {roomList
                                 .filter(r => r.toLowerCase().includes(session.location.toLowerCase()))
                                 .slice(0, 30)
@@ -988,14 +998,9 @@ export default function App() {
                                     {r}
                                   </div>
                                 ))}
+
                               {session.location && roomList.filter(r => r.toLowerCase().includes(session.location.toLowerCase())).length === 0 && (
-                                <div
-                                  className="subject-option custom-entry"
-                                  onClick={() => setActiveLocationDropdown(null)}
-                                >
-                                  <Plus size={14} className="mr-2" style={{ display: 'inline' }} />
-                                  Use custom: "{session.location}"
-                                </div>
+                                <div className="subject-no-results">No matches. Use custom name above.</div>
                               )}
                             </div>
                           )}
