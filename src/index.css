@@ -174,7 +174,7 @@ h1:hover {
 
 /* Day Cells */
 .day-cell {
-  background-color: #0f172a;
+  background-color: var(--panel-bg);
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   padding: 1rem;
@@ -182,13 +182,9 @@ h1:hover {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  position: sticky;
-  left: 0;
-  z-index: 5;
   transition: opacity 0.3s ease;
 }
 
-.is-horizontally-scrolled .day-cell,
 .is-horizontally-scrolled .header-cell:first-child {
   opacity: 0.15;
   pointer-events: none;
