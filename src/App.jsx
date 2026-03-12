@@ -826,7 +826,14 @@ export default function App() {
       {/* Subject Form Modal */}
       {modalOpen && (
         <div className="modal-overlay" onMouseDown={() => setModalOpen(false)}>
-          <div className="modal-content" onMouseDown={e => e.stopPropagation()}>
+          <div className="modal-content" onMouseDown={e => {
+            // Close dropdowns if clicking elsewhere in the modal
+            if (!e.target.closest('.search-input-wrapper') && !e.target.closest('.location-input-wrapper') && !e.target.closest('.subject-dropdown')) {
+              setShowSubjectDropdown(false);
+              setActiveLocationDropdown(null);
+            }
+            e.stopPropagation();
+          }}>
             <div className="modal-header">
               <h2 className="modal-title">{editingId ? 'Edit Subject' : 'Add Subject'}</h2>
               <button className="close-button" onClick={() => setModalOpen(false)}>
