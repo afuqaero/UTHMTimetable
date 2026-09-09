@@ -26,13 +26,6 @@ const colors = [
 
 const sections = Array.from({ length: 50 }, (_, i) => `S${i + 1}`);
 
-// Use explicit RGB colors so the muted cards render identically in image/PDF exports.
-const subjectSurface = (color) => {
-  const hex = /^#[0-9a-f]{6}$/i.test(color) ? color.slice(1) : '6A4C93';
-  const base = [30, 41, 59];
-  return `rgb(${base.map((channel, i) => Math.round(channel * 0.82 + parseInt(hex.slice(i * 2, i * 2 + 2), 16) * 0.18)).join(', ')})`;
-};
-
 const formatHour = (index) => `${String((8 + Number(index)) % 24).padStart(2, '0')}:00`;
 
 const getGridPosition = (grid, x, y) => {
