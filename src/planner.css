@@ -33,7 +33,7 @@
 .planner .day-cell { background: var(--panel-bg-alt); justify-content: flex-start; padding: 1rem; font-size: .85rem; position: sticky; left: 0; z-index: 12; }
 .planner .header-cell:first-child { left: 0; z-index: 13; opacity: 1; pointer-events: auto; }
 .planner .grid-cell { border-right: 1px solid rgba(51,65,85,.55); }
-.planner .subject-item { align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 11px 12px; background: linear-gradient(135deg, color-mix(in srgb, var(--subject-color) 78%, white), var(--subject-color)); border: 1px solid color-mix(in srgb, var(--subject-color) 78%, white); border-left: 3px solid var(--subject-color); border-radius: 7px; box-shadow: 0 5px 14px rgba(0,0,0,.24), inset 0 1px 1px rgba(255,255,255,.2); gap: 5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.72); }
+.planner .subject-item { align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 11px 12px; background: var(--subject-color); border: 1px solid color-mix(in srgb, var(--subject-color) 78%, white); border-left: 3px solid color-mix(in srgb, var(--subject-color) 82%, white); border-radius: 7px; box-shadow: 0 5px 14px rgba(0,0,0,.24), inset 0 1px 1px rgba(255,255,255,.2); gap: 5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.72); }
 .planner .subject-drag-handle { position: absolute; top: 7px; right: 6px; color: rgba(226, 232, 240, .72); pointer-events: none; }
 .planner .subject-item:hover .subject-drag-handle { color: rgba(248, 250, 252, .95); }
 .planner .subject-item:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px color-mix(in srgb, var(--subject-color) 24%, transparent), inset 0 1px 1px rgba(255,255,255,.18); }
