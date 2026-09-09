@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search } from 'lucide-react';
+import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search, GripVertical } from 'lucide-react';
 import subjectList from './data/subjects.json';
 import roomList from './data/rooms.json';
 import html2canvas from 'html2canvas';
@@ -737,7 +737,7 @@ export default function App() {
           <Link to="/" style={{ textDecoration: 'none' }}>
             <h1>UTHM Timetable Planner</h1>
           </Link>
-          <p className="header-subtitle">Click anywhere on the grid to add subject. Drag to move, or pull the sides to resize.</p>
+          <p className="header-subtitle desktop-instruction">Click anywhere on the grid to add subject. Drag to move, or pull the sides to resize.</p>
           <p className="header-subtitle" style={{ marginTop: '4px', fontWeight: '500', color: 'var(--text-muted)' }}>by <a href="https://www.threads.net/@feeq_azmir" target="_blank" rel="noopener noreferrer" className="creator-link">feeq</a></p>
         </div>
 
@@ -785,7 +785,10 @@ export default function App() {
           <p>{subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'}<span>·</span>{subjects.reduce((total, subject) => total + subject.sessions.length, 0)} sessions<span>·</span>{subjects.reduce((total, subject) => total + subject.sessions.reduce((hours, session) => hours + Number(session.endIndex) - Number(session.startIndex), 0), 0)} hours of classes</p>
         </div>
         <div className="planner-toolbar-actions">
-          <button type="button" className="btn planner-reset" onClick={handleReset}><RefreshCcw size={15} />Reset timetable</button>
+          <div className="planner-reset-group">
+            <button type="button" className="btn planner-reset" onClick={handleReset}><RefreshCcw size={15} />Reset timetable</button>
+            <p className="mobile-instruction"><GripVertical size={13} aria-hidden="true" />Hold and drag a class, or tap it then tap an empty slot.</p>
+          </div>
           <button className="btn btn-secondary calendar-save" onClick={exportICS}><Calendar size={16} />Save to Calendar</button>
         </div>
       </section>
@@ -904,6 +907,7 @@ export default function App() {
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                   />
+                  <GripVertical className="subject-drag-handle" size={16} aria-hidden="true" />
                   <div className="type-badge">{getShortType(session.type || 'Lecture')}</div>
                   <div className="subject-name">{subject.name}</div>
                   <div className="subject-time">{formatHour(session.startIndex)}–{formatHour(session.endIndex)}</div>
