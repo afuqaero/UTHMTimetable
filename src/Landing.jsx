@@ -1,6 +1,5 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import './Landing.css';
 
@@ -17,7 +16,7 @@ export default function Landing() {
       </div>
 
       <div className="landing-content">
-        <motion.div 
+        <Motion.div 
           className="badge"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -25,9 +24,9 @@ export default function Landing() {
         >
           <Sparkles size={16} />
           <span>The best way to plan your semester</span>
-        </motion.div>
+        </Motion.div>
 
-        <motion.h1 
+        <Motion.h1 
           className="landing-title"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -35,18 +34,18 @@ export default function Landing() {
         >
           UTHM Timetable <br />
           <span className="text-gradient">Planner</span>
-        </motion.h1>
+        </Motion.h1>
 
-        <motion.p 
+        <Motion.p 
           className="landing-subtitle"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
           Build your perfect schedule in seconds. Drag, drop, and export your timetable with a beautiful, seamless experience.
-        </motion.p>
+        </Motion.p>
 
-        <motion.div 
+        <Motion.div 
           className="landing-actions"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,10 +56,10 @@ export default function Landing() {
             <span>Build Timetable</span>
             <ArrowRight size={20} className="arrow-icon" />
           </button>
-        </motion.div>
+        </Motion.div>
       </div>
 
-      <motion.div 
+      <Motion.div 
         className="app-preview"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -82,7 +81,7 @@ export default function Landing() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }

@@ -1,0 +1,281 @@
+{
+  "semester": {
+    "label": "JADUAL WAKTU KULIAH AKADEMIK SEMESTER I SESI 2025/2026",
+    "code": "202520261",
+    "slug": "jadual-waktu-kuliah-akademik-semester-i-sesi-2025-2026"
+  },
+  "scrape": {
+    "startedAt": "2026-03-12T15:49:53.325Z",
+    "completedAt": "2026-03-12T15:53:17.056Z",
+    "requestDelayMs": 75,
+    "rawSnapshotDir": "misc/uthm-scrape/jadual-waktu-kuliah-akademik-semester-i-sesi-2025-2026/20260312T154953Z",
+    "sourceBaseUrl": "https://timetable.uthm.edu.my/"
+  },
+  "counts": {
+    "coursePrograms": 11,
+    "courses": 1295,
+    "roomBuildings": 15,
+    "rooms": 499,
+    "batchFaculties": 11,
+    "cohorts": 500,
+    "lecturers": 1150,
+    "cohortSchedules": 500,
+    "cohortSessions": 6803
+  },
+  "drift": {
+    "subjects": {
+      "previousCount": 1033,
+      "nextCount": 1295,
+      "overlapCount": 532,
+      "previousOnlyCount": 501,
+      "nextOnlyCount": 763,
+      "previousOnlySample": [
+        "BBA30203 - LUKISAN KEJURUTERAAN PENYEJUKBEKUAN DAN PENYAMANAN UDARA",
+        "BBB20503 - TEKNOLOGI PEMBINAAN 2",
+        "BBB30302 - BEKALAN AIR DAN SISTEM PEMBENTUNGAN",
+        "BBB40103 - LUKISAN BANGUNAN",
+        "BBB40203 - MAKMAL PERPAIPAN DOMESTIK",
+        "BBB40803 - KERJA KAYU 2",
+        "BBI20402 - TEKNOKEUSAHAWANAN 1",
+        "BBI40812 - INDUSTRIAL TRAINING",
+        "BBJ10203 - LAPORAN TEKNIKAL",
+        "BBJ10304 - PENGUKURAN DAN PENGUJIAN SISTEM ELEKTRIK",
+        "BBJ20705 - Building Electrical System Maintenance",
+        "BBJ20805 - Renewable Energy System Maintenance",
+        "BBJ21203 - Collegiality Interaction and Management",
+        "BBJ31305 - INDUSTRIAL MACHINERY CONTROL SYSTEM DESIGN",
+        "BBK27103 - KEMAHIRAN DAN ETIKA PENYAJIAN"
+      ],
+      "nextOnlySample": [
+        "BBA30303 - KAWALAN MOTOR ELEKTRIK",
+        "BBA40303 - SISTEM DIOGNASIS DAN ANALISIS PENYEJUKBEKUAN DAN PENYAM",
+        "BBA40503 - PENGURUSAN PENYELIAAN PEMASANGAN & PENYELEGGARAAN SISTEM",
+        "BBA40603 - REKA BENTUK SISTEM PENYAMAN UDARA",
+        "BBB30103 - MEKANIK STRUKTUR",
+        "BBB30503 - TEKNOLOGI PEMBINAAN 3",
+        "BBD10102 - FALSAFAH PENDIDIKAN",
+        "BBI10103 - Industrial Revolutions",
+        "BBI10202 - Enterpreneurship",
+        "BBI20303 - Psychology in Industry",
+        "BBI30504 - TECHNOPRENEUR CAPSTONE 2: MANAGING NEW & ONGOING VENTURES",
+        "BBJ10104 - Electrical System Drafting and Simulation",
+        "BBJ10405 - Solar PV Installation and Maintenance",
+        "BBJ10505 - Switchboard Maintenance and Calibration",
+        "BBJ10603 - Professional Practices"
+      ]
+    },
+    "rooms": {
+      "previousCount": 996,
+      "previousNormalizedCount": 547,
+      "nextCount": 499,
+      "overlapCount": 499,
+      "previousOnlyCount": 48,
+      "nextOnlyCount": 0,
+      "previousOnlySample": [
+        "B-DUMMY ENGLISH 1",
+        "B-DUMMY ENGLISH 2",
+        "B-DUMMY ENGLISH 3",
+        "B-DUMMY ENGLISH 4",
+        "B-DUMMY ENGLISH 5",
+        "B-KC-BP",
+        "B-KC-LG-MBU1",
+        "B-RMC-CNC D1",
+        "E-G1-MP-A",
+        "F-FKAAB - STUDIO 3",
+        "F-FKAAB-MMB",
+        "F-FKAAB-STUDIO1",
+        "F-FKAAB-STUDIO2",
+        "P-FPTP-BILIK SEMINAR B1",
+        "P-TF-PAGOH"
+      ],
+      "nextOnlySample": [],
+      "duplicateNormalizedLocalCount": 446,
+      "duplicateNormalizedLocalSample": [
+        {
+          "code": "B-C1-MKATC1",
+          "variants": [
+            "B-C1-MKATC1",
+            "B-C1-MKATC1 (FPTV)"
+          ]
+        },
+        {
+          "code": "B-C1-MKATC2",
+          "variants": [
+            "B-C1-MKATC2",
+            "B-C1-MKATC2 (FPTV)"
+          ]
+        },
+        {
+          "code": "B-C1-MKATC3",
+          "variants": [
+            "B-C1-MKATC3",
+            "B-C1-MKATC3 (FPTV)"
+          ]
+        },
+        {
+          "code": "B-C11-001-GS",
+          "variants": [
+            "B-C11-001-GS",
+            "B-C11-001-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-C11-002-GS",
+          "variants": [
+            "B-C11-002-GS",
+            "B-C11-002-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E14-BK1-GS",
+          "variants": [
+            "B-E14-BK1-GS",
+            "B-E14-BK1-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E14-BK2-GS",
+          "variants": [
+            "B-E14-BK2-GS",
+            "B-E14-BK2-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E14-BK3-GS",
+          "variants": [
+            "B-E14-BK3-GS",
+            "B-E14-BK3-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E15-BK1-GS",
+          "variants": [
+            "B-E15-BK1-GS",
+            "B-E15-BK1-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E15-BK2-GS",
+          "variants": [
+            "B-E15-BK2-GS",
+            "B-E15-BK2-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E15-BK3-GS",
+          "variants": [
+            "B-E15-BK3-GS",
+            "B-E15-BK3-GS (INDUK GUNASAMA)"
+          ]
+        },
+        {
+          "code": "B-E6-BKB",
+          "variants": [
+            "B-E6-BKB",
+            "B-E6-BKB (FPTV)"
+          ]
+        },
+        {
+          "code": "B-FPTV-BT1",
+          "variants": [
+            "B-FPTV-BT1",
+            "B-FPTV-BT1 (FPTV)"
+          ]
+        },
+        {
+          "code": "B-FPTV-BT2",
+          "variants": [
+            "B-FPTV-BT2",
+            "B-FPTV-BT2 (FPTV)"
+          ]
+        },
+        {
+          "code": "B-FPTV-BT3",
+          "variants": [
+            "B-FPTV-BT3",
+            "B-FPTV-BT3 (FPTV)"
+          ]
+        }
+      ]
+    }
+  },
+  "validations": {
+    "subjects": {
+      "ok": true,
+      "sorted": true,
+      "unique": true,
+      "nonEmpty": true,
+      "count": 1295
+    },
+    "rooms": {
+      "ok": true,
+      "sorted": true,
+      "unique": true,
+      "nonEmpty": true,
+      "normalizedUnique": true,
+      "count": 499
+    },
+    "cohortSessions": {
+      "ok": true,
+      "nonEmpty": true,
+      "invalidCount": 0,
+      "invalidSample": [],
+      "count": 6803
+    }
+  },
+  "liveChecks": {
+    "courseBIW30503": {
+      "ok": true,
+      "workloadText": "06 H 00 M",
+      "sessionCount": 6
+    },
+    "cohortFSKTM_3BIW": {
+      "ok": true,
+      "workloadText": "42 H 00 M",
+      "sessionCount": 42,
+      "containsBIW33103": true,
+      "containsBIW30503": true
+    },
+    "roomI_BT1": {
+      "ok": true,
+      "workloadText": "04 H 00 M",
+      "sessionCount": 3
+    },
+    "lecturerSearchSyafiq": {
+      "ok": true,
+      "optionCount": 4,
+      "optionsSample": [
+        "D-syafiq",
+        "N-mohdsyafiq",
+        "NS- JTKE2 PN SYAFIQAH RUQAIYAH",
+        "W-syafiqah"
+      ]
+    }
+  },
+  "findings": [
+    "The site is scrapeable with session-preserving HTTP; no browser automation is required.",
+    "subjects.json drift against the live semester catalog is 532 overlaps, 501 local-only, and 763 site-only entries.",
+    "rooms.json overlap after normalization is 499 of 499 live rooms already present locally; the local file still has 446 duplicate normalized room codes from suffix variants.",
+    "showScheduleDetail exposes day, time, venue, course, group, class type, department, and student counts, but not lecturer name."
+  ],
+  "warnings": [
+    "Lecturer faculty view failed for FAST: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FKAAB: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FKEE: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FKMP: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FPTP: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FPTV: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FSKTM: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for FTK: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for PPB: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for PPD: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error",
+    "Lecturer faculty view failed for PPUK: Request failed for https://timetable.uthm.edu.my/index.php/site/lecturer: 500 Internal Server Error"
+  ],
+  "files": {
+    "catalog": "src/data/uthm/catalog.json",
+    "cohortSchedules": "src/data/uthm/cohort-schedules.json",
+    "summary": "src/data/uthm/summary.json",
+    "subjects": "src/data/subjects.json",
+    "rooms": "src/data/rooms.json"
+  }
+}

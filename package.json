@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync:uthm": "node ./scripts/sync-uthm-timetable.mjs",
+    "test:uthm-sync": "node --test tests/uthm-sync.test.mjs tests/uthm-sync.generated.test.mjs",
+    "test:uthm-sync:live": "node --test tests/uthm-sync.live.test.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.0",

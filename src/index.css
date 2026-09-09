@@ -1034,6 +1034,14 @@ select.form-control {
   background: #1e3352 !important;
 }
 
+.custom-location-hint {
+  color: var(--text-muted);
+  text-align: left;
+  font-size: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .mr-2 {
   margin-right: 0.5rem;
 }

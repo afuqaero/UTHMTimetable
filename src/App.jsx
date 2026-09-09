@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Link } from 'react-router-dom';
 import './index.css';
+import './planner.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -25,8 +26,31 @@ const colors = [
 
 const sections = Array.from({ length: 50 }, (_, i) => `S${i + 1}`);
 
+// Use explicit RGB colors so the muted cards render identically in image/PDF exports.
+const subjectSurface = (color) => {
+  const hex = /^#[0-9a-f]{6}$/i.test(color) ? color.slice(1) : '6A4C93';
+  const base = [30, 41, 59];
+  return `rgb(${base.map((channel, i) => Math.round(channel * 0.82 + parseInt(hex.slice(i * 2, i * 2 + 2), 16) * 0.18)).join(', ')})`;
+};
+
+const formatHour = (index) => `${String((8 + Number(index)) % 24).padStart(2, '0')}:00`;
+
+const getGridPosition = (grid, x, y) => {
+  const rect = grid.getBoundingClientRect();
+  const style = window.getComputedStyle(grid);
+  const findTrack = (tracks, position) => {
+    let edge = 0;
+    return tracks.split(' ').findIndex(track => { edge += parseFloat(track); return position < edge; });
+  };
+  return {
+    colIndex: x < rect.left || x >= rect.right ? -1 : findTrack(style.gridTemplateColumns, x - rect.left) - 1,
+    rowIndex: y < rect.top || y >= rect.bottom ? -1 : findTrack(style.gridTemplateRows, y - rect.top) - 1,
+  };
+};
+
 // ID Generator Helper
 const generateId = () => Math.random().toString(36).substr(2, 9);
+const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
 
 const getShortType = (type) => {
   switch (type) {
@@ -38,6 +62,12 @@ const getShortType = (type) => {
       return 'Lec';
   }
 };
+
+const escapeICSText = (value) => String(value ?? '')
+  .replace(/\\/g, '\\\\')
+  .replace(/\r\n|\r|\n/g, '\\n')
+  .replace(/;/g, '\\;')
+  .replace(/,/g, '\\,');
 
 export default function App() {
   const [subjects, setSubjects] = useState(() => {
@@ -138,7 +168,7 @@ export default function App() {
     setFormData({
       name: '',
       section: 'S1',
-      color: colors[Math.floor(Math.random() * colors.length)],
+      color: getRandomColor(),
       sessions: defaultSession ? [defaultSession] : [
         { id: generateId(), day: 'Monday', startIndex: 0, endIndex: 1, location: '', lecturer: '', type: 'Lecture' }
       ]
@@ -404,6 +434,8 @@ export default function App() {
   // ----- Touch Handling for Mobile ----- //
 
   const handleTouchStart = (e, subject, sessionIndex, type = 'move') => {
+    // Keep the gesture on the timetable instead of letting the page scroll.
+    e.preventDefault();
     // Determine grabOffset if move
     let grabOffset = 0;
     if (type === 'move') {
@@ -432,6 +464,7 @@ export default function App() {
 
   const handleTouchMove = (e) => {
     if (!draggedItem || !touchState) return;
+    e.preventDefault();
     const touch = e.touches[0];
 
     // Update touchState for visual follow
@@ -444,16 +477,7 @@ export default function App() {
       // Find what day/time it is from parents or attributes
       // Simple way: check parent's position or classes
       // But instead, we'll use coordinates to match the grid
-      const gridRect = gridRef.current.getBoundingClientRect();
-      const relativeX = touch.clientX - gridRect.left;
-      const relativeY = touch.clientY - gridRect.top;
-
-      // Header row height = 60px, Header col width = 135px
-      const colWidth = (gridRect.width - 135) / 12;
-      const rowHeight = (gridRect.height - 60) / 5;
-
-      const colIndex = Math.floor((relativeX - 135) / colWidth);
-      const rowIndex = Math.floor((relativeY - 60) / rowHeight);
+      const { colIndex, rowIndex } = getGridPosition(gridRef.current, touch.clientX, touch.clientY);
 
       if (rowIndex >= 0 && rowIndex < 5 && colIndex >= 0 && colIndex < maxEndIndex) {
         const targetDay = days[rowIndex];
@@ -468,18 +492,11 @@ export default function App() {
 
   const handleTouchEnd = (e) => {
     if (!draggedItem || !touchState) return;
+    e.preventDefault();
 
     if (draggedItem.type === 'move') {
       const touch = e.changedTouches[0];
-      const gridRect = gridRef.current.getBoundingClientRect();
-      const relativeX = touch.clientX - gridRect.left;
-      const relativeY = touch.clientY - gridRect.top;
-
-      const colWidth = (gridRect.width - 135) / maxEndIndex;
-      const rowHeight = (gridRect.height - 60) / 5;
-
-      const colIndex = Math.floor((relativeX - 135) / colWidth);
-      const rowIndex = Math.floor((relativeY - 60) / rowHeight);
+      const { colIndex, rowIndex } = getGridPosition(gridRef.current, touch.clientX, touch.clientY);
 
       if (rowIndex >= 0 && rowIndex < 5 && colIndex >= 0 && colIndex < maxEndIndex) {
         performMove(draggedItem.subjectId, draggedItem.sessionIndex, days[rowIndex], colIndex, draggedItem.grabOffset || 0);
@@ -571,16 +588,22 @@ export default function App() {
           });
         } else {
           clonedGrid.style.setProperty('--cols', maxCol);
+          clonedGrid.style.gridTemplateColumns = `135px repeat(${maxCol}, 110px)`;
         }
 
         Array.from(clonedGrid.querySelectorAll('.header-cell')).forEach(cell => {
+          cell.style.position = 'static';
+        });
+        Array.from(clonedGrid.querySelectorAll('.day-cell')).forEach(cell => {
           cell.style.position = 'static';
         });
 
         // Strip interactive effects so the export doesn't depend on hover/scroll/touch state.
         Array.from(clonedGrid.querySelectorAll('.subject-item')).forEach(item => {
           item.style.boxShadow = 'none';
-          item.style.border = 'none';
+          item.style.borderTop = 'none';
+          item.style.borderRight = 'none';
+          item.style.borderBottom = 'none';
           item.style.transform = 'none';
           item.style.filter = 'none';
           item.style.opacity = '1';
@@ -664,6 +687,7 @@ export default function App() {
 
     subjects.forEach((subj) => {
       subj.sessions.forEach(session => {
+        const summary = subj.section ? `${subj.name} (${subj.section})` : subj.name;
         const targetDayIdx = days.indexOf(session.day) + 1; // 1 to 5 (Mon to Fri)
         const currentDayIdx = now.getDay() || 7; // Sunday is 0 mapping to 7
 
@@ -685,9 +709,11 @@ export default function App() {
         icsContent += `DTSTART:${formatICSDate(eventStart)}\r\n`;
         icsContent += `DTEND:${formatICSDate(eventEnd)}\r\n`;
         icsContent += `RRULE:FREQ=WEEKLY;COUNT=14\r\n`; // Assumes 14 weeks typical semester length!
-        icsContent += `SUMMARY:${subj.name} (${subj.section})\r\n`;
-        if (session.location) icsContent += `LOCATION:${session.location}\r\n`;
-        if (session.lecturer) icsContent += `DESCRIPTION:Lecturer: ${session.lecturer}\\n\r\n`; // \\n for newline in ICS
+        icsContent += `SUMMARY:${escapeICSText(summary)}\r\n`;
+        if (session.location) icsContent += `LOCATION:${escapeICSText(session.location)}\r\n`;
+        if (session.lecturer) {
+          icsContent += `DESCRIPTION:${escapeICSText(`Lecturer: ${session.lecturer}`)}\r\n`;
+        }
         icsContent += "END:VEVENT\r\n";
       });
     });
@@ -705,8 +731,8 @@ export default function App() {
 
 
   return (
-    <div className="app-container">
-      <header>
+    <div className="app-container planner">
+      <header className="planner-header">
         <div className="header-info">
           <Link to="/" style={{ textDecoration: 'none' }}>
             <h1>UTHM Timetable Planner</h1>
@@ -716,23 +742,8 @@ export default function App() {
         </div>
 
         <div className="header-actions">
-          <button
-            type="button"
-            className="btn btn-danger-outline"
-            onClick={() => handleReset()}
-            title="Reset Timetable"
-          >
-            <RefreshCcw size={18} />
-            <span className="hide-on-mobile">Reset</span>
-          </button>
-
-          <button className="btn btn-secondary" onClick={exportICS}>
-            <Calendar size={18} />
-            <span className="hide-on-mobile">Save to Calendar</span>
-          </button>
-
           <div className="dropdown-container">
-            <button className="btn btn-secondary" onClick={() => setExportMenuOpen(!exportMenuOpen)}>
+            <button className="btn btn-secondary" aria-label="Export timetable" aria-expanded={exportMenuOpen} onClick={() => setExportMenuOpen(!exportMenuOpen)}>
               <Download size={18} />
               <span className="hide-on-mobile">Export File</span>
               <ChevronDown size={14} className="hide-on-mobile" style={{ marginLeft: '4px' }} />
@@ -759,6 +770,7 @@ export default function App() {
           </div>
           <button
             className="btn btn-primary add-subject-btn"
+            aria-label="Add subject"
             onClick={() => openNewSubjectModal()}
           >
             <Plus size={18} />
@@ -766,6 +778,17 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      <section className="planner-toolbar" aria-label="Timetable overview">
+        <div className="planner-overview">
+          <div className="planner-week"><Calendar size={18} /><h2>Weekly timetable</h2><span className="planner-recurring">Recurring</span></div>
+          <p>{subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'}<span>·</span>{subjects.reduce((total, subject) => total + subject.sessions.length, 0)} sessions<span>·</span>{subjects.reduce((total, subject) => total + subject.sessions.reduce((hours, session) => hours + Number(session.endIndex) - Number(session.startIndex), 0), 0)} hours of classes</p>
+        </div>
+        <div className="planner-toolbar-actions">
+          <button type="button" className="btn planner-reset" onClick={handleReset}><RefreshCcw size={15} />Reset timetable</button>
+          <button className="btn btn-secondary calendar-save" onClick={exportICS}><Calendar size={16} />Save to Calendar</button>
+        </div>
+      </section>
 
       <main className={`timetable-wrapper ${isScrolled ? 'is-horizontally-scrolled' : ''}`} ref={wrapperRef}>
         <div className="timetable-grid" ref={gridRef} style={{ '--cols': timeSlots.length }}>
@@ -775,7 +798,7 @@ export default function App() {
           </div>
           {timeSlots.map((time, i) => (
             <div key={`header-${i}`} className="header-cell" data-time-index={i} style={{ gridColumn: i + 2, gridRow: 1 }}>
-              {time}
+              <span aria-label={time}>{formatHour(i)}</span>
             </div>
           ))}
 
@@ -832,6 +855,10 @@ export default function App() {
                 <div
                   key={`session-${subject.id}-${sIdx}`}
                   className="subject-item"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${subject.name}, ${session.day}, ${formatHour(session.startIndex)} to ${formatHour(session.endIndex)}. Edit subject`}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSubjectClick(e, subject); } }}
                   data-session-day-index={dayIdx}
                   data-session-start-index={session.startIndex}
                   data-session-end-index={session.endIndex}
@@ -841,7 +868,8 @@ export default function App() {
                   style={{
                     gridColumn: `${startCol} / ${endCol}`,
                     gridRow: row,
-                    backgroundColor: subject.color,
+                    backgroundColor: subjectSurface(subject.color),
+                    borderLeftColor: subject.color,
                     opacity: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type === 'move') ? 0.5 : 1,
                     pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type.startsWith('resize')) ? 'none' : 'auto',
                     transform: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx && touchState.type === 'move')
@@ -878,6 +906,7 @@ export default function App() {
                   />
                   <div className="type-badge">{getShortType(session.type || 'Lecture')}</div>
                   <div className="subject-name">{subject.name}</div>
+                  <div className="subject-time">{formatHour(session.startIndex)}–{formatHour(session.endIndex)}</div>
                   {subject.section && (
                     <div className="subject-section">{subject.section} {session.type && `- ${session.type}`}</div>
                   )}
@@ -897,6 +926,13 @@ export default function App() {
           )}
         </div>
       </main>
+
+      <footer className="planner-footer">
+        <div className="subject-legend" aria-label="Subject colors">
+          {subjects.map(subject => <span key={subject.id}><i style={{ backgroundColor: subject.color }} aria-hidden="true" />{subject.name}</span>)}
+          {subjects.length === 0 && <span>Your subjects will appear here.</span>}
+        </div>
+      </footer>
 
       {/* Subject Form Modal */}
       {modalOpen && (
@@ -964,13 +1000,17 @@ export default function App() {
 
                   <div className="form-group" style={{ flex: 1 }}>
                     <label>Section</label>
-                    <select
+                    <input
                       className="form-control"
+                      list="section-options"
+                      placeholder="e.g. S1 or custom"
                       value={formData.section}
                       onChange={e => setFormData({ ...formData, section: e.target.value })}
-                    >
-                      {sections.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                      aria-label="Section name"
+                    />
+                    <datalist id="section-options">
+                      {sections.map(s => <option key={s} value={s} />)}
+                    </datalist>
                   </div>
                 </div>
 
@@ -1054,13 +1094,17 @@ export default function App() {
                           />
                           {activeLocationDropdown === sIdx && (
                             <div className="custom-dropdown subject-dropdown" ref={locationDropdownRef} style={{ maxHeight: '160px' }}>
-                              {session.location && (
+                              {session.location.trim() ? (
                                 <div
                                   className="subject-option custom-entry"
                                   onClick={() => setActiveLocationDropdown(null)}
                                 >
                                   <Plus size={14} className="mr-2" style={{ display: 'inline' }} />
                                   Use custom: "{session.location}"
+                                </div>
+                              ) : (
+                                <div className="subject-no-results custom-location-hint">
+                                  Type a location above to use a custom room name.
                                 </div>
                               )}
 
