@@ -871,7 +871,7 @@ export default function App() {
                   style={{
                     gridColumn: `${startCol} / ${endCol}`,
                     gridRow: row,
-                    backgroundColor: subjectSurface(subject.color),
+                    backgroundColor: subject.color,
                     borderLeftColor: subject.color,
                     '--subject-color': subject.color,
                     opacity: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type === 'move') ? 0.5 : 1,
