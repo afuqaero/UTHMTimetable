@@ -499,108 +499,152 @@ export default function App() {
     ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
   );
 
-  const exportPNG = async () => {
+  const createExportCanvas = async (orientation = 'landscape') => {
+    const maxCol = getExportMaxCol();
+    const isPortrait = orientation === 'portrait';
+    const exportWidth = isPortrait
+      ? 125 + (days.length * 180)
+      : 135 + (maxCol * 110);
+
+    return html2canvas(gridRef.current, {
+      scale: 2,
+      backgroundColor: '#1e293b',
+      useCORS: true,
+      width: exportWidth,
+      windowWidth: Math.max(1600, exportWidth),
+      scrollX: 0,
+      scrollY: 0,
+      onclone: (clonedDoc) => {
+        const clonedWrapper = clonedDoc.querySelector('.timetable-wrapper');
+        if (clonedWrapper) {
+          clonedWrapper.classList.remove('is-horizontally-scrolled');
+          clonedWrapper.scrollLeft = 0;
+          clonedWrapper.scrollTop = 0;
+        }
+
+        const clonedGrid = clonedDoc.querySelector('.timetable-grid');
+        if (!clonedGrid) return;
+
+        clonedGrid.style.width = `${exportWidth}px`;
+        clonedGrid.style.minWidth = `${exportWidth}px`;
+
+        if (isPortrait) {
+          clonedGrid.style.gridTemplateColumns = `125px repeat(${days.length}, 180px)`;
+          clonedGrid.style.gridTemplateRows = `55px repeat(${maxCol}, 135px)`;
+
+          const cornerCell = clonedGrid.querySelector('[data-export-role="corner"]');
+          if (cornerCell) cornerCell.textContent = 'Time \\ Day';
+
+          Array.from(clonedGrid.querySelectorAll('[data-time-index]')).forEach(cell => {
+            const timeIndex = parseInt(cell.dataset.timeIndex, 10);
+            if (timeIndex >= maxCol) {
+              cell.style.display = 'none';
+              return;
+            }
+            cell.style.gridColumn = '1';
+            cell.style.gridRow = `${timeIndex + 2}`;
+          });
+
+          Array.from(clonedGrid.querySelectorAll('[data-day-index]')).forEach(cell => {
+            const dayIndex = parseInt(cell.dataset.dayIndex, 10);
+            cell.style.gridColumn = `${dayIndex + 2}`;
+            cell.style.gridRow = '1';
+          });
+
+          Array.from(clonedGrid.querySelectorAll('[data-grid-day-index]')).forEach(cell => {
+            const dayIndex = parseInt(cell.dataset.gridDayIndex, 10);
+            const timeIndex = parseInt(cell.dataset.gridTimeIndex, 10);
+            if (timeIndex >= maxCol) {
+              cell.style.display = 'none';
+              return;
+            }
+            cell.style.gridColumn = `${dayIndex + 2}`;
+            cell.style.gridRow = `${timeIndex + 2}`;
+          });
+
+          Array.from(clonedGrid.querySelectorAll('[data-session-day-index]')).forEach(item => {
+            const dayIndex = parseInt(item.dataset.sessionDayIndex, 10);
+            const startIndex = parseInt(item.dataset.sessionStartIndex, 10);
+            const endIndex = parseInt(item.dataset.sessionEndIndex, 10);
+            item.style.gridColumn = `${dayIndex + 2}`;
+            item.style.gridRow = `${startIndex + 2} / ${endIndex + 2}`;
+          });
+        } else {
+          clonedGrid.style.setProperty('--cols', maxCol);
+        }
+
+        Array.from(clonedGrid.querySelectorAll('.header-cell')).forEach(cell => {
+          cell.style.position = 'static';
+        });
+
+        // Strip interactive effects so the export doesn't depend on hover/scroll/touch state.
+        Array.from(clonedGrid.querySelectorAll('.subject-item')).forEach(item => {
+          item.style.boxShadow = 'none';
+          item.style.border = 'none';
+          item.style.transform = 'none';
+          item.style.filter = 'none';
+          item.style.opacity = '1';
+          item.style.transition = 'none';
+        });
+
+        Array.from(clonedGrid.querySelectorAll('.resize-handle')).forEach(handle => {
+          handle.style.display = 'none';
+        });
+
+        Array.from(clonedGrid.querySelectorAll('.type-badge')).forEach(badge => {
+          badge.style.backdropFilter = 'none';
+          badge.style.webkitBackdropFilter = 'none';
+        });
+
+        if (!isPortrait) {
+          // Hide cells beyond the latest occupied hour so the export width stays predictable.
+          Array.from(clonedGrid.children).forEach(cell => {
+            const colStyle = cell.style.gridColumn;
+            if (colStyle) {
+              const colStart = parseInt(colStyle.split(' / ')[0], 10);
+              if (colStart > maxCol + 1) {
+                cell.style.display = 'none';
+              }
+            }
+          });
+        }
+      }
+    });
+  };
+
+  const exportPNG = async (orientation = 'landscape') => {
     if (!gridRef.current) return;
     try {
-      const maxCol = getExportMaxCol();
-      const exportWidth = 135 + (maxCol * 110);
-
-      const canvas = await html2canvas(gridRef.current, {
-        scale: 2,
-        backgroundColor: '#1e293b',
-        useCORS: true,
-        width: exportWidth,
-        windowWidth: 1600, // Force desktop width for capture
-        onclone: (clonedDoc) => {
-          const clonedWrapper = clonedDoc.querySelector('.timetable-wrapper');
-          if (clonedWrapper) clonedWrapper.classList.remove('is-horizontally-scrolled');
-
-          const clonedGrid = clonedDoc.querySelector('.timetable-grid');
-          if (clonedGrid) {
-            clonedGrid.style.setProperty('--cols', maxCol);
-            clonedGrid.style.width = `${exportWidth}px`;
-            clonedGrid.style.minWidth = `${exportWidth}px`;
-
-            // Fix html2canvas box-shadow inset and border rendering bugs
-            Array.from(clonedGrid.querySelectorAll('.subject-item')).forEach(item => {
-              item.style.boxShadow = 'none';
-              item.style.border = 'none';
-            });
-
-            // Hide cells beyond maxCol
-            Array.from(clonedGrid.children).forEach(cell => {
-              const colStyle = cell.style.gridColumn;
-              if (colStyle) {
-                const colStart = parseInt(colStyle.split(' / ')[0], 10);
-                if (colStart > maxCol + 1) {
-                  cell.style.display = 'none';
-                }
-              }
-            });
-          }
-        }
-      });
+      const canvas = await createExportCanvas(orientation);
       const image = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = image;
-      a.download = "Timetable.png";
+      a.download = `Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.png`;
       a.click();
     } catch (e) {
       console.error("Export PNG failed", e);
     }
   };
 
-  const exportPDF = async () => {
+  const exportPDF = async (orientation = 'landscape') => {
     if (!gridRef.current) return;
     try {
-      const maxCol = getExportMaxCol();
-      const exportWidth = 135 + (maxCol * 110);
+      const canvas = await createExportCanvas(orientation);
+      const imgData = canvas.toDataURL('image/jpeg', 1);
+      const pxToPt = 72 / 96;
+      const pdfWidth = canvas.width * pxToPt;
+      const pdfHeight = canvas.height * pxToPt;
 
-      const canvas = await html2canvas(gridRef.current, {
-        scale: 2,
-        backgroundColor: '#1e293b',
-        useCORS: true,
-        width: exportWidth,
-        windowWidth: 1600,
-        onclone: (clonedDoc) => {
-          const clonedWrapper = clonedDoc.querySelector('.timetable-wrapper');
-          if (clonedWrapper) clonedWrapper.classList.remove('is-horizontally-scrolled');
-
-          const clonedGrid = clonedDoc.querySelector('.timetable-grid');
-          if (clonedGrid) {
-            clonedGrid.style.setProperty('--cols', maxCol);
-            clonedGrid.style.width = `${exportWidth}px`;
-            clonedGrid.style.minWidth = `${exportWidth}px`;
-
-            // Fix html2canvas box-shadow inset and border rendering bugs
-            Array.from(clonedGrid.querySelectorAll('.subject-item')).forEach(item => {
-              item.style.boxShadow = 'none';
-              item.style.border = 'none';
-            });
-
-            Array.from(clonedGrid.children).forEach(cell => {
-              const colStyle = cell.style.gridColumn;
-              if (colStyle) {
-                const colStart = parseInt(colStyle.split(' / ')[0], 10);
-                if (colStart > maxCol + 1) {
-                  cell.style.display = 'none';
-                }
-              }
-            });
-          }
-        }
-      });
-      const imgData = canvas.toDataURL("image/png");
-
-      // Create the PDF with the exact dimensions of the image canvas to prevent whitespace
+      // Use PDF points and a JPEG snapshot for broader viewer compatibility.
       const pdf = new jsPDF({
-        orientation: canvas.width > canvas.height ? "landscape" : "portrait",
-        unit: "px",
-        format: [canvas.width, canvas.height]
+        orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
+        unit: 'pt',
+        format: [pdfWidth, pdfHeight],
+        compress: true
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save("Timetable.pdf");
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      pdf.save(`Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.pdf`);
     } catch (e) {
       console.error("Export PDF failed", e);
     }
@@ -695,11 +739,20 @@ export default function App() {
             </button>
             {exportMenuOpen && (
               <div className="dropdown-menu">
-                <button className="dropdown-item" onClick={() => { exportPNG(); setExportMenuOpen(false); }}>
-                  <ImageIcon size={16} /> PNG Image
+                <div className="dropdown-heading">PNG image</div>
+                <button className="dropdown-item" onClick={() => { exportPNG('landscape'); setExportMenuOpen(false); }}>
+                  <ImageIcon size={16} /> Landscape
                 </button>
-                <button className="dropdown-item" onClick={() => { exportPDF(); setExportMenuOpen(false); }}>
-                  <Download size={16} /> PDF Document
+                <button className="dropdown-item" onClick={() => { exportPNG('portrait'); setExportMenuOpen(false); }}>
+                  <ImageIcon size={16} /> Portrait
+                </button>
+                <div className="dropdown-divider" />
+                <div className="dropdown-heading">PDF document</div>
+                <button className="dropdown-item" onClick={() => { exportPDF('landscape'); setExportMenuOpen(false); }}>
+                  <Download size={16} /> Landscape
+                </button>
+                <button className="dropdown-item" onClick={() => { exportPDF('portrait'); setExportMenuOpen(false); }}>
+                  <Download size={16} /> Portrait
                 </button>
               </div>
             )}
@@ -717,11 +770,11 @@ export default function App() {
       <main className={`timetable-wrapper ${isScrolled ? 'is-horizontally-scrolled' : ''}`} ref={wrapperRef}>
         <div className="timetable-grid" ref={gridRef} style={{ '--cols': timeSlots.length }}>
           {/* Top Header Row */}
-          <div className="header-cell" style={{ gridColumn: 1, gridRow: 1 }}>
+          <div className="header-cell" data-export-role="corner" style={{ gridColumn: 1, gridRow: 1 }}>
             Day \ Time
           </div>
           {timeSlots.map((time, i) => (
-            <div key={`header-${i}`} className="header-cell" style={{ gridColumn: i + 2, gridRow: 1 }}>
+            <div key={`header-${i}`} className="header-cell" data-time-index={i} style={{ gridColumn: i + 2, gridRow: 1 }}>
               {time}
             </div>
           ))}
@@ -731,6 +784,7 @@ export default function App() {
             <React.Fragment key={`day-row-${day}`}>
               <div
                 className="day-cell"
+                data-day-index={dIdx}
                 style={{ gridColumn: 1, gridRow: dIdx + 2 }}
               >
                 {day}
@@ -740,6 +794,8 @@ export default function App() {
                 <div
                   key={`cell-${day}-${tIdx}`}
                   className="grid-cell"
+                  data-grid-day-index={dIdx}
+                  data-grid-time-index={tIdx}
                   style={{ gridColumn: tIdx + 2, gridRow: dIdx + 2 }}
                   onClick={() => handleCellClick(day, tIdx)}
                   onDragEnter={(e) => handleDragEnterCell(e, day, tIdx)}
@@ -776,6 +832,9 @@ export default function App() {
                 <div
                   key={`session-${subject.id}-${sIdx}`}
                   className="subject-item"
+                  data-session-day-index={dayIdx}
+                  data-session-start-index={session.startIndex}
+                  data-session-end-index={session.endIndex}
                   draggable
                   onDragStart={(e) => handleDragStart(e, subject, sIdx)}
                   onDragEnd={handleDragEnd}

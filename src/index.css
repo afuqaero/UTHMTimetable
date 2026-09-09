@@ -712,12 +712,27 @@ select.form-control {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  min-width: 180px;
+  min-width: 190px;
   display: flex;
   flex-direction: column;
   z-index: 50;
   overflow: hidden;
   animation: fadeIn 0.15s forwards;
+}
+
+.dropdown-heading {
+  padding: 0.65rem 1rem 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dropdown-divider {
+  height: 1px;
+  margin: 0.25rem 0;
+  background-color: var(--border-color);
 }
 
 .dropdown-item {
