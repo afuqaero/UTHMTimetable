@@ -873,6 +873,7 @@ export default function App() {
                     gridRow: row,
                     backgroundColor: subjectSurface(subject.color),
                     borderLeftColor: subject.color,
+                    '--subject-color': subject.color,
                     opacity: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type === 'move') ? 0.5 : 1,
                     pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type.startsWith('resize')) ? 'none' : 'auto',
                     transform: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx && touchState.type === 'move')
