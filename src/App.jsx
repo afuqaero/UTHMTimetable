@@ -529,9 +529,13 @@ export default function App() {
   const createExportCanvas = async (orientation = 'landscape') => {
     const maxCol = getExportMaxCol();
     const isPortrait = orientation === 'portrait';
-    const exportWidth = isPortrait
+    const isMobile = orientation === 'mobile';
+    const exportWidth = isMobile
+      ? 645
+      : isPortrait
       ? 125 + (days.length * 180)
       : 135 + (maxCol * 110);
+    const mobileRowHeight = Math.max(84, Math.floor((1398 - 55) / maxCol));
 
     return html2canvas(gridRef.current, {
       scale: 2,
@@ -555,9 +559,12 @@ export default function App() {
         clonedGrid.style.width = `${exportWidth}px`;
         clonedGrid.style.minWidth = `${exportWidth}px`;
 
-        if (isPortrait) {
-          clonedGrid.style.gridTemplateColumns = `125px repeat(${days.length}, 180px)`;
-          clonedGrid.style.gridTemplateRows = `55px repeat(${maxCol}, 135px)`;
+        if (isPortrait || isMobile) {
+          const dayColumnWidth = isMobile ? 115 : 180;
+          const timeColumnWidth = isMobile ? 70 : 125;
+          const rowHeight = isMobile ? mobileRowHeight : 135;
+          clonedGrid.style.gridTemplateColumns = `${timeColumnWidth}px repeat(${days.length}, ${dayColumnWidth}px)`;
+          clonedGrid.style.gridTemplateRows = `55px repeat(${maxCol}, ${rowHeight}px)`;
 
           const cornerCell = clonedGrid.querySelector('[data-export-role="corner"]');
           if (cornerCell) cornerCell.textContent = 'Time \\ Day';
@@ -653,7 +660,8 @@ export default function App() {
         if (blob) resolve(blob);
         else reject(new Error('Could not create PNG file'));
       }, 'image/png'));
-      downloadBlob(image, `Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.png`);
+      const label = orientation === 'mobile' ? 'iPhone-Wallpaper' : orientation === 'portrait' ? 'Portrait' : 'Landscape';
+      downloadBlob(image, `Timetable-${label}.png`);
     } catch (e) {
       console.error("Export PNG failed", e);
     }
@@ -677,7 +685,8 @@ export default function App() {
       });
 
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-      downloadBlob(pdf.output('blob'), `Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.pdf`);
+      const label = orientation === 'mobile' ? 'iPhone-Wallpaper' : orientation === 'portrait' ? 'Portrait' : 'Landscape';
+      downloadBlob(pdf.output('blob'), `Timetable-${label}.pdf`);
     } catch (e) {
       console.error("Export PDF failed", e);
     }
@@ -767,6 +776,9 @@ export default function App() {
                 <button className="dropdown-item" onClick={() => { exportPNG('portrait'); setExportMenuOpen(false); }}>
                   <ImageIcon size={16} /> Portrait
                 </button>
+                <button className="dropdown-item" onClick={() => { exportPNG('mobile'); setExportMenuOpen(false); }}>
+                  <ImageIcon size={16} /> iPhone wallpaper
+                </button>
                 <div className="dropdown-divider" />
                 <div className="dropdown-heading">PDF document</div>
                 <button className="dropdown-item" onClick={() => { exportPDF('landscape'); setExportMenuOpen(false); }}>
@@ -774,6 +786,9 @@ export default function App() {
                 </button>
                 <button className="dropdown-item" onClick={() => { exportPDF('portrait'); setExportMenuOpen(false); }}>
                   <Download size={16} /> Portrait
+                </button>
+                <button className="dropdown-item" onClick={() => { exportPDF('mobile'); setExportMenuOpen(false); }}>
+                  <Download size={16} /> iPhone wallpaper
                 </button>
               </div>
             )}
