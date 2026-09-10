@@ -504,6 +504,18 @@ export default function App() {
 
   // ----- Export Functions ----- //
 
+  const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   const getExportMaxCol = () => Math.max(
     10, // At least show until 18:00
     ...subjects.flatMap(s => s.sessions.map(sess => parseInt(sess.endIndex, 10) || 0))
@@ -632,11 +644,11 @@ export default function App() {
     if (!gridRef.current) return;
     try {
       const canvas = await createExportCanvas(orientation);
-      const image = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = image;
-      a.download = `Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.png`;
-      a.click();
+      const image = await new Promise((resolve, reject) => canvas.toBlob(blob => {
+        if (blob) resolve(blob);
+        else reject(new Error('Could not create PNG file'));
+      }, 'image/png'));
+      downloadBlob(image, `Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.png`);
     } catch (e) {
       console.error("Export PNG failed", e);
     }
@@ -660,7 +672,7 @@ export default function App() {
       });
 
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-      pdf.save(`Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.pdf`);
+      downloadBlob(pdf.output('blob'), `Timetable-${orientation === 'portrait' ? 'Portrait' : 'Landscape'}.pdf`);
     } catch (e) {
       console.error("Export PDF failed", e);
     }
