@@ -102,6 +102,8 @@ export default function App() {
   // Searchable locations state
   const [activeLocationDropdown, setActiveLocationDropdown] = useState(null);
   const locationDropdownRef = useRef(null);
+  const [showSectionDropdown, setShowSectionDropdown] = useState(false);
+  const sectionDropdownRef = useRef(null);
 
   // Save changes
   useEffect(() => {
@@ -119,6 +121,9 @@ export default function App() {
       }
       if (locationDropdownRef.current && !locationDropdownRef.current.contains(e.target) && !e.target.closest('.location-input-wrapper')) {
         setActiveLocationDropdown(null);
+      }
+      if (sectionDropdownRef.current && !sectionDropdownRef.current.contains(e.target) && !e.target.closest('.section-input-wrapper')) {
+        setShowSectionDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -1008,19 +1013,30 @@ export default function App() {
                     )}
                   </div>
 
-                  <div className="form-group" style={{ flex: 1 }}>
+                  <div className="form-group section-input-wrapper" style={{ flex: 1, zIndex: showSectionDropdown ? 100 : 1 }}>
                     <label>Section</label>
                     <input
                       className="form-control"
-                      list="section-options"
                       placeholder="e.g. S1 or custom"
                       value={formData.section}
+                      onFocus={() => setShowSectionDropdown(true)}
                       onChange={e => setFormData({ ...formData, section: e.target.value })}
                       aria-label="Section name"
                     />
-                    <datalist id="section-options">
-                      {sections.map(s => <option key={s} value={s} />)}
-                    </datalist>
+                    {showSectionDropdown && (
+                      <div className="subject-dropdown section-dropdown" ref={sectionDropdownRef}>
+                        {formData.section.trim() && (
+                          <div className="subject-option custom-entry" onClick={() => setShowSectionDropdown(false)}>
+                            <Plus size={14} className="mr-2" />Use custom: "{formData.section}"
+                          </div>
+                        )}
+                        {sections.filter(section => section.toLowerCase().includes(formData.section.toLowerCase())).slice(0, 30).map(section => (
+                          <div key={section} className="subject-option" onClick={() => { setFormData({ ...formData, section }); setShowSectionDropdown(false); }}>
+                            {section}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 

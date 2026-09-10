@@ -1042,6 +1042,20 @@ select.form-control {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.section-dropdown {
+  left: auto;
+  right: 0;
+  min-width: 180px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .section-dropdown {
+    width: min(220px, calc(100vw - 32px));
+  }
+}
+
 .mr-2 {
   margin-right: 0.5rem;
 }
