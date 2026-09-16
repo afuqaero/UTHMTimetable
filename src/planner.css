@@ -28,12 +28,25 @@
 .planner-overview p span { margin: 0 .55rem; }
 .planner .calendar-save { font-size: .8rem; padding: .65rem .85rem; }
 .planner .timetable-wrapper { border-radius: 14px; box-shadow: 0 8px 24px -16px rgba(0,0,0,.5); margin-bottom: 0; }
-.planner .timetable-grid { grid-template-columns: 110px repeat(var(--cols, 16), minmax(78px, 1fr)); min-width: calc(110px + var(--cols, 16) * 78px); grid-template-rows: 46px repeat(5, minmax(96px, auto)); }
+.planner .timetable-grid {
+  --header-row-height: 46px;
+  --session-lane-height: 96px;
+  grid-template-columns: 110px repeat(var(--cols, 16), minmax(78px, 1fr));
+  min-width: calc(110px + var(--cols, 16) * 78px);
+  grid-template-rows:
+    var(--header-row-height)
+    minmax(calc(var(--day-0-lanes, 1) * var(--session-lane-height)), auto)
+    minmax(calc(var(--day-1-lanes, 1) * var(--session-lane-height)), auto)
+    minmax(calc(var(--day-2-lanes, 1) * var(--session-lane-height)), auto)
+    minmax(calc(var(--day-3-lanes, 1) * var(--session-lane-height)), auto)
+    minmax(calc(var(--day-4-lanes, 1) * var(--session-lane-height)), auto);
+}
 .planner .header-cell { background: var(--panel-bg-alt); font-size: .75rem; font-variant-numeric: tabular-nums; border-right-color: rgba(51,65,85,.5); }
+.planner .header-time-range { font-size: .65rem; white-space: nowrap; }
 .planner .day-cell { background: var(--panel-bg-alt); justify-content: flex-start; padding: 1rem; font-size: .85rem; position: sticky; left: 0; z-index: 12; }
 .planner .header-cell:first-child { left: 0; z-index: 13; opacity: 1; pointer-events: auto; }
 .planner .grid-cell { border-right: 1px solid rgba(51,65,85,.55); }
-.planner .subject-item { align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 11px 12px; background: var(--subject-color); border: 1px solid rgba(255,255,255,.3); border-left: 3px solid rgba(255,255,255,.58); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2), inset 0 1px 1px rgba(255,255,255,.12); gap: 5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.planner .subject-item { align-self: start; box-sizing: border-box; height: calc(var(--session-lane-height) - 10px); top: calc(var(--session-lane-index, 0) * var(--session-lane-height)); align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 11px 12px; background: var(--subject-color); border: 1px solid rgba(255,255,255,.3); border-left: 3px solid rgba(255,255,255,.58); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2), inset 0 1px 1px rgba(255,255,255,.12); gap: 5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .planner .subject-drag-handle { position: absolute; top: 7px; right: 6px; color: rgba(226, 232, 240, .72); pointer-events: none; }
 .planner .subject-item:hover .subject-drag-handle { color: rgba(248, 250, 252, .95); }
 .planner .subject-item:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px color-mix(in srgb, var(--subject-color) 24%, transparent), inset 0 1px 1px rgba(255,255,255,.18); }
@@ -81,7 +94,7 @@
   .planner-toolbar-actions { width: auto; justify-content: flex-start; }
   .planner .calendar-save { font-size: .75rem; }
   .planner-footer { flex-direction: column; gap: .75rem; }
-  .planner .timetable-grid { grid-template-columns: 96px repeat(var(--cols, 16), 96px); min-width: calc(96px + var(--cols, 16) * 96px); grid-template-rows: 44px repeat(5, minmax(100px, auto)); }
+  .planner .timetable-grid { --header-row-height: 44px; --session-lane-height: 100px; grid-template-columns: 96px repeat(var(--cols, 16), 96px); min-width: calc(96px + var(--cols, 16) * 96px); }
   .planner .day-cell { padding: .75rem; font-size: .8rem; }
 }
 @media (prefers-reduced-motion: reduce) {

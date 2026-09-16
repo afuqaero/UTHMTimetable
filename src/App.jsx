@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search, GripVertical } from 'lucide-react';
 import subjectList from './data/subjects.json';
 import roomList from './data/rooms.json';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Link } from 'react-router-dom';
+import { buildSessionLayout, formatHour, formatTimeRange, getSessionLayoutKey } from './timetable-layout.js';
 import './index.css';
 import './planner.css';
 
@@ -25,8 +26,6 @@ const colors = [
 ];
 
 const sections = Array.from({ length: 50 }, (_, i) => `S${i + 1}`);
-
-const formatHour = (index) => `${String((8 + Number(index)) % 24).padStart(2, '0')}:00`;
 
 const getGridPosition = (grid, x, y) => {
   const rect = grid.getBoundingClientRect();
@@ -76,6 +75,7 @@ export default function App() {
     }
     return [];
   });
+  const timetableLayout = useMemo(() => buildSessionLayout(subjects, days), [subjects]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -600,8 +600,15 @@ export default function App() {
             const dayIndex = parseInt(item.dataset.sessionDayIndex, 10);
             const startIndex = parseInt(item.dataset.sessionStartIndex, 10);
             const endIndex = parseInt(item.dataset.sessionEndIndex, 10);
+            const laneIndex = parseInt(item.dataset.sessionLaneIndex, 10) || 0;
+            const laneCount = parseInt(item.dataset.sessionLaneCount, 10) || 1;
             item.style.gridColumn = `${dayIndex + 2}`;
             item.style.gridRow = `${startIndex + 2} / ${endIndex + 2}`;
+            item.style.alignSelf = 'stretch';
+            item.style.height = 'auto';
+            item.style.top = '0';
+            item.style.width = laneCount > 1 ? `calc(${100 / laneCount}% - 10px)` : 'auto';
+            item.style.left = laneCount > 1 ? `${laneIndex * (100 / laneCount)}%` : '0';
           });
         } else {
           clonedGrid.style.setProperty('--cols', maxCol);
@@ -819,14 +826,24 @@ export default function App() {
       </section>
 
       <main className={`timetable-wrapper ${isScrolled ? 'is-horizontally-scrolled' : ''}`} ref={wrapperRef}>
-        <div className="timetable-grid" ref={gridRef} style={{ '--cols': timeSlots.length }}>
+        <div
+          className="timetable-grid"
+          ref={gridRef}
+          style={{
+            '--cols': timeSlots.length,
+            ...Object.fromEntries(days.map((day, index) => [
+              `--day-${index}-lanes`,
+              timetableLayout.dayLaneCounts[day],
+            ])),
+          }}
+        >
           {/* Top Header Row */}
           <div className="header-cell" data-export-role="corner" style={{ gridColumn: 1, gridRow: 1 }}>
             Day \ Time
           </div>
           {timeSlots.map((time, i) => (
             <div key={`header-${i}`} className="header-cell" data-time-index={i} style={{ gridColumn: i + 2, gridRow: 1 }}>
-              <span aria-label={time}>{formatHour(i)}</span>
+              <span className="header-time-range" aria-label={time}>{formatTimeRange(i)}</span>
             </div>
           ))}
 
@@ -878,6 +895,10 @@ export default function App() {
               const startCol = parseInt(session.startIndex, 10) + 2;
               const endCol = parseInt(session.endIndex, 10) + 2;
               const row = dayIdx + 2;
+              const layout = timetableLayout.sessions[getSessionLayoutKey(subject.id, sIdx)] || {
+                laneIndex: 0,
+                laneCount: 1,
+              };
 
               return (
                 <div
@@ -890,6 +911,8 @@ export default function App() {
                   data-session-day-index={dayIdx}
                   data-session-start-index={session.startIndex}
                   data-session-end-index={session.endIndex}
+                  data-session-lane-index={layout.laneIndex}
+                  data-session-lane-count={layout.laneCount}
                   draggable
                   onDragStart={(e) => handleDragStart(e, subject, sIdx)}
                   onDragEnd={handleDragEnd}
@@ -899,6 +922,7 @@ export default function App() {
                     backgroundColor: subject.color,
                     borderLeftColor: subject.color,
                     '--subject-color': subject.color,
+                    '--session-lane-index': layout.laneIndex,
                     opacity: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type === 'move') ? 0.5 : 1,
                     pointerEvents: (draggedItem && draggedItem.subjectId === subject.id && draggedItem.sessionIndex === sIdx && draggedItem.type.startsWith('resize')) ? 'none' : 'auto',
                     transform: (touchState && touchState.subjectId === subject.id && touchState.sessionIndex === sIdx && touchState.type === 'move')
