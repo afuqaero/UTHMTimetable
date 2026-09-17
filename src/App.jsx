@@ -954,7 +954,7 @@ export default function App() {
                   />
                   <GripVertical className="subject-drag-handle" size={16} aria-hidden="true" />
                   <div className="type-badge">{session.type || 'Lecture'}</div>
-                  <div className="subject-name">{subject.name}</div>
+                  <div className="subject-name" title={subject.name}>{subject.name}</div>
                   {subject.section && (
                     <div className="subject-section">{subject.section}</div>
                   )}
