@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search, GripVertical } from 'lucide-react';
 import subjectList from './data/subjects.json';
 import roomList from './data/rooms.json';
@@ -106,6 +106,13 @@ export default function App() {
   const [showSectionDropdown, setShowSectionDropdown] = useState(false);
   const sectionDropdownRef = useRef(null);
 
+  const closeSubjectModal = useCallback(() => {
+    setModalOpen(false);
+    setShowSubjectDropdown(false);
+    setActiveLocationDropdown(null);
+    setShowSectionDropdown(false);
+  }, []);
+
   // Save changes
   useEffect(() => {
     localStorage.setItem('timetable_subjects_v2', JSON.stringify(subjects));
@@ -149,21 +156,21 @@ export default function App() {
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') {
-        setModalOpen(false);
-        setShowSubjectDropdown(false);
-        setActiveLocationDropdown(null);
+        closeSubjectModal();
       }
     };
     if (modalOpen) {
       window.addEventListener('keydown', handleEsc);
     }
     return () => window.removeEventListener('keydown', handleEsc);
-  }, [modalOpen]);
+  }, [closeSubjectModal, modalOpen]);
 
   const openNewSubjectModal = (defaultSession = null) => {
     setEditingId(null);
     setSubjectSearch('');
     setShowSubjectDropdown(false);
+    setActiveLocationDropdown(null);
+    setShowSectionDropdown(false);
     setFormData({
       name: '',
       section: 'S1',
@@ -193,6 +200,8 @@ export default function App() {
     setEditingId(subject.id);
     setSubjectSearch('');
     setShowSubjectDropdown(false);
+    setActiveLocationDropdown(null);
+    setShowSectionDropdown(false);
     // Deep copy to prevent accidental mutations before save
     setFormData({
       ...subject,
@@ -287,14 +296,14 @@ export default function App() {
     } else {
       setSubjects([...subjects, { ...formData, id: generateId() }]);
     }
-    setModalOpen(false);
+    closeSubjectModal();
   };
 
   const handleDelete = () => {
     if (editingId) {
       setSubjects(subjects.filter(s => s.id !== editingId));
     }
-    setModalOpen(false);
+    closeSubjectModal();
   };
 
   const handleReset = () => {
@@ -995,7 +1004,7 @@ export default function App() {
 
       {/* Subject Form Modal */}
       {modalOpen && (
-        <div className="modal-overlay" onMouseDown={() => setModalOpen(false)}>
+        <div className="modal-overlay" onMouseDown={closeSubjectModal}>
           <div className="modal-content" onMouseDown={e => {
             // Close dropdowns if clicking elsewhere in the modal
             if (!e.target.closest('.search-input-wrapper') && !e.target.closest('.location-input-wrapper') && !e.target.closest('.subject-dropdown')) {
@@ -1006,7 +1015,7 @@ export default function App() {
           }}>
             <div className="modal-header">
               <h2 className="modal-title">{editingId ? 'Edit Subject' : 'Add Subject'}</h2>
-              <button className="close-button" onClick={() => setModalOpen(false)}>
+              <button className="close-button" onClick={closeSubjectModal}>
                 <X size={20} />
               </button>
             </div>
@@ -1290,7 +1299,7 @@ export default function App() {
                   Delete Subject
                 </button>
               )}
-              <button type="button" className="btn btn-secondary" onClick={() => setModalOpen(false)}>
+              <button type="button" className="btn btn-secondary" onClick={closeSubjectModal}>
                 Cancel
               </button>
               <button type="submit" form="subject-form" className="btn btn-primary" disabled={formData.sessions.length === 0}>
