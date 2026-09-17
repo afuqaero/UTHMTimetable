@@ -5,6 +5,7 @@ import {
   buildSessionLayout,
   formatTimeRange,
 } from '../src/timetable-layout.js';
+import { isTapGesture } from '../src/timetable-interactions.js';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -55,4 +56,11 @@ test('adjacent sessions reuse one lane instead of being treated as conflicts', (
   assert.deepEqual(layout.sessions['first:0'], { laneIndex: 0, laneCount: 1 });
   assert.deepEqual(layout.sessions['second:0'], { laneIndex: 0, laneCount: 1 });
   assert.equal(layout.dayLaneCounts.Monday, 1);
+});
+
+test('a stationary touch is treated as a tap while a moved touch remains a drag', () => {
+  const start = { startX: 100, startY: 200 };
+
+  assert.equal(isTapGesture(start, { clientX: 105, clientY: 204 }), true);
+  assert.equal(isTapGesture(start, { clientX: 111, clientY: 200 }), false);
 });

@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Link } from 'react-router-dom';
 import { buildSessionLayout, formatHour, formatTimeRange, getSessionLayoutKey } from './timetable-layout.js';
+import { isTapGesture } from './timetable-interactions.js';
 import './index.css';
 import './planner.css';
 
@@ -43,17 +44,6 @@ const getGridPosition = (grid, x, y) => {
 // ID Generator Helper
 const generateId = () => Math.random().toString(36).substr(2, 9);
 const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
-
-const getShortType = (type) => {
-  switch (type) {
-    case 'Tutorial': return 'Tut';
-    case 'Lab': return 'Lab';
-    case 'Workshop': return 'Wks';
-    case 'Lecture':
-    default:
-      return 'Lec';
-  }
-};
 
 const escapeICSText = (value) => String(value ?? '')
   .replace(/\\/g, '\\\\')
@@ -492,8 +482,13 @@ export default function App() {
     if (!draggedItem || !touchState) return;
     e.preventDefault();
 
-    if (draggedItem.type === 'move') {
-      const touch = e.changedTouches[0];
+    const touch = e.changedTouches[0];
+    const isTap = isTapGesture(touchState, touch);
+
+    if (draggedItem.type === 'move' && isTap) {
+      const subject = subjects.find(item => item.id === draggedItem.subjectId);
+      if (subject) handleSubjectClick(e, subject);
+    } else if (draggedItem.type === 'move') {
       const { colIndex, rowIndex } = getGridPosition(gridRef.current, touch.clientX, touch.clientY);
 
       if (rowIndex >= 0 && rowIndex < 5 && colIndex >= 0 && colIndex < maxEndIndex) {
@@ -958,21 +953,10 @@ export default function App() {
                     onTouchEnd={handleTouchEnd}
                   />
                   <GripVertical className="subject-drag-handle" size={16} aria-hidden="true" />
-                  <div className="type-badge">{getShortType(session.type || 'Lecture')}</div>
+                  <div className="type-badge">{session.type || 'Lecture'}</div>
                   <div className="subject-name">{subject.name}</div>
-                  <div className="subject-time">{formatHour(session.startIndex)}–{formatHour(session.endIndex)}</div>
                   {subject.section && (
-                    <div className="subject-section">{subject.section} {session.type && `- ${session.type}`}</div>
-                  )}
-                  {session.location && (
-                    <div className="subject-details flex items-center gap-2 mt-1">
-                      <MapPin size={10} /> {session.location}
-                    </div>
-                  )}
-                  {session.lecturer && (
-                    <div className="subject-details flex items-center gap-2 mt-1">
-                      <User size={10} /> {session.lecturer}
-                    </div>
+                    <div className="subject-section">{subject.section}</div>
                   )}
                 </div>
               );

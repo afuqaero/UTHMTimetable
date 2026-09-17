@@ -46,13 +46,12 @@
 .planner .day-cell { background: var(--panel-bg-alt); justify-content: flex-start; padding: 1rem; font-size: .85rem; position: sticky; left: 0; z-index: 12; }
 .planner .header-cell:first-child { left: 0; z-index: 13; opacity: 1; pointer-events: auto; }
 .planner .grid-cell { border-right: 1px solid rgba(51,65,85,.55); }
-.planner .subject-item { align-self: start; box-sizing: border-box; height: calc(var(--session-lane-height) - 10px); top: calc(var(--session-lane-index, 0) * var(--session-lane-height)); align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 11px 12px; background: var(--subject-color); border: 1px solid rgba(255,255,255,.3); border-left: 3px solid rgba(255,255,255,.58); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2), inset 0 1px 1px rgba(255,255,255,.12); gap: 5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.planner .subject-item { align-self: start; box-sizing: border-box; min-height: calc(var(--session-lane-height) - 10px); height: auto; top: calc(var(--session-lane-index, 0) * var(--session-lane-height)); align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 8px 10px; background: var(--subject-color); border: 1px solid rgba(255,255,255,.3); border-left: 3px solid rgba(255,255,255,.58); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2), inset 0 1px 1px rgba(255,255,255,.12); gap: 3px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); overflow: visible; }
 .planner .subject-drag-handle { position: absolute; top: 7px; right: 6px; color: rgba(226, 232, 240, .72); pointer-events: none; }
 .planner .subject-item:hover .subject-drag-handle { color: rgba(248, 250, 252, .95); }
 .planner .subject-item:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px color-mix(in srgb, var(--subject-color) 24%, transparent), inset 0 1px 1px rgba(255,255,255,.18); }
-.planner .subject-name { font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; margin: 0; }
-.planner .type-badge { position: static; align-self: flex-start; order: -1; font-size: .6rem; padding: 1px 5px; background: rgba(248,250,252,.08); color: var(--text-muted); backdrop-filter: none; text-transform: uppercase; letter-spacing: .04em; }
-.planner .subject-time { font-size: .7rem; font-variant-numeric: tabular-nums; color: var(--text-main); }
+.planner .subject-name { width: 100%; min-width: 0; font-size: .8rem; line-height: 1.35; overflow-wrap: anywhere; margin: 0; }
+.planner .type-badge { position: static; align-self: flex-start; order: -1; font-size: .6rem; line-height: 1.2; padding: 1px 5px; background: rgba(248,250,252,.08); color: var(--text-muted); backdrop-filter: none; text-transform: uppercase; letter-spacing: .04em; }
 .planner .subject-section { background: rgba(0,0,0,.36); font-size: .7rem; font-weight: 800; color: #fff; padding: 2px 6px; border-radius: 4px; margin: 1px 0 3px; text-shadow: none; }
 .planner .subject-details { color: rgba(255,255,255,.82); font-size: .7rem; line-height: 1.4; overflow-wrap: anywhere; opacity: 1; margin: 0; gap: 5px; }
 .planner .subject-details svg { flex-shrink: 0; }
