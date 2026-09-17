@@ -45,6 +45,17 @@ const getGridPosition = (grid, x, y) => {
 const generateId = () => Math.random().toString(36).substr(2, 9);
 const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
 
+const getShortType = (type) => {
+  switch (type) {
+    case 'Tutorial': return 'Tut';
+    case 'Lab': return 'Lab';
+    case 'Workshop': return 'Wks';
+    case 'Lecture':
+    default:
+      return 'Lec';
+  }
+};
+
 const escapeICSText = (value) => String(value ?? '')
   .replace(/\\/g, '\\\\')
   .replace(/\r\n|\r|\n/g, '\\n')
@@ -953,10 +964,20 @@ export default function App() {
                     onTouchEnd={handleTouchEnd}
                   />
                   <GripVertical className="subject-drag-handle" size={16} aria-hidden="true" />
-                  <div className="type-badge">{session.type || 'Lecture'}</div>
+                  <div className="type-badge">{getShortType(session.type || 'Lecture')}</div>
                   <div className="subject-name" title={subject.name}>{subject.name}</div>
                   {subject.section && (
-                    <div className="subject-section">{subject.section}</div>
+                    <div className="subject-section">{subject.section} {session.type && `– ${session.type}`}</div>
+                  )}
+                  {session.location && (
+                    <div className="subject-details flex items-center gap-2 mt-1">
+                      <MapPin size={10} /> {session.location}
+                    </div>
+                  )}
+                  {session.lecturer && (
+                    <div className="subject-details flex items-center gap-2 mt-1">
+                      <User size={10} /> {session.lecturer}
+                    </div>
                   )}
                 </div>
               );

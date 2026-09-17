@@ -30,7 +30,7 @@
 .planner .timetable-wrapper { border-radius: 14px; box-shadow: 0 8px 24px -16px rgba(0,0,0,.5); margin-bottom: 0; }
 .planner .timetable-grid {
   --header-row-height: 46px;
-  --session-lane-height: 96px;
+  --session-lane-height: 130px;
   grid-template-columns: 110px repeat(var(--cols, 16), minmax(78px, 1fr));
   min-width: calc(110px + var(--cols, 16) * 78px);
   grid-template-rows:
@@ -46,14 +46,14 @@
 .planner .day-cell { background: var(--panel-bg-alt); justify-content: flex-start; padding: 1rem; font-size: .85rem; position: sticky; left: 0; z-index: 12; }
 .planner .header-cell:first-child { left: 0; z-index: 13; opacity: 1; pointer-events: auto; }
 .planner .grid-cell { border-right: 1px solid rgba(51,65,85,.55); }
-.planner .subject-item { align-self: start; box-sizing: border-box; container-type: inline-size; height: calc(var(--session-lane-height) - 10px); top: calc(var(--session-lane-index, 0) * var(--session-lane-height)); align-items: flex-start; justify-content: flex-start; text-align: left; margin: 5px; padding: 6px 8px; background: var(--subject-color); border: 1px solid rgba(255,255,255,.3); border-left: 3px solid rgba(255,255,255,.58); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2), inset 0 1px 1px rgba(255,255,255,.12); gap: 2px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); overflow: hidden; }
+.planner .subject-item { align-self: start; box-sizing: border-box; container-type: inline-size; height: calc(var(--session-lane-height) - 10px); top: calc(var(--session-lane-index, 0) * var(--session-lane-height)); align-items: center; justify-content: center; text-align: center; margin: 5px; padding: 10px 8px; background: var(--subject-color); border: 1px solid rgba(255,255,255,.3); border-left: 3px solid rgba(255,255,255,.58); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2), inset 0 1px 1px rgba(255,255,255,.12); gap: 3px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); overflow: hidden; }
 .planner .subject-drag-handle { position: absolute; top: 7px; right: 6px; color: rgba(226, 232, 240, .72); pointer-events: none; }
 .planner .subject-item:hover .subject-drag-handle { color: rgba(248, 250, 252, .95); }
 .planner .subject-item:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px color-mix(in srgb, var(--subject-color) 24%, transparent), inset 0 1px 1px rgba(255,255,255,.18); }
 .planner .subject-name { width: 100%; min-width: 0; font-size: .72rem; font-size: clamp(.55rem, 7cqw, .72rem); line-height: 1.2; overflow-wrap: anywhere; margin: 0; }
-.planner .type-badge { position: static; align-self: flex-start; order: -1; font-size: .55rem; line-height: 1.1; padding: 1px 4px; background: rgba(248,250,252,.08); color: var(--text-muted); backdrop-filter: none; text-transform: uppercase; letter-spacing: .04em; }
-.planner .subject-section { background: rgba(0,0,0,.36); font-size: .62rem; line-height: 1.1; font-weight: 800; color: #fff; padding: 1px 5px; border-radius: 4px; margin: 0; text-shadow: none; }
-.planner .subject-details { color: rgba(255,255,255,.82); font-size: .7rem; line-height: 1.4; overflow-wrap: anywhere; opacity: 1; margin: 0; gap: 5px; }
+.planner .type-badge { position: absolute; top: 5px; right: 5px; font-size: .55rem; line-height: 1.1; padding: 1px 4px; background: rgba(248,250,252,.08); color: var(--text-muted); backdrop-filter: none; letter-spacing: .04em; }
+.planner .subject-section { background: rgba(0,0,0,.36); font-size: .62rem; line-height: 1.1; font-weight: 800; color: #fff; padding: 2px 6px; border-radius: 4px; margin: 0; text-shadow: none; }
+.planner .subject-details { display: flex; align-items: center; justify-content: center; width: 100%; color: rgba(255,255,255,.82); font-size: .65rem; line-height: 1.2; overflow-wrap: anywhere; opacity: 1; margin: 0; gap: 4px; }
 .planner .subject-details svg { flex-shrink: 0; }
 .planner-footer { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.25rem; padding-top: 1rem; }
 .subject-legend { display: flex; flex-wrap: wrap; gap: .65rem 1.25rem; padding-top: .45rem; }
@@ -93,7 +93,7 @@
   .planner-toolbar-actions { width: auto; justify-content: flex-start; }
   .planner .calendar-save { font-size: .75rem; }
   .planner-footer { flex-direction: column; gap: .75rem; }
-  .planner .timetable-grid { --header-row-height: 44px; --session-lane-height: 100px; grid-template-columns: 96px repeat(var(--cols, 16), 96px); min-width: calc(96px + var(--cols, 16) * 96px); }
+  .planner .timetable-grid { --header-row-height: 44px; --session-lane-height: 130px; grid-template-columns: 96px repeat(var(--cols, 16), 96px); min-width: calc(96px + var(--cols, 16) * 96px); }
   .planner .day-cell { padding: .75rem; font-size: .8rem; }
 }
 @media (prefers-reduced-motion: reduce) {
