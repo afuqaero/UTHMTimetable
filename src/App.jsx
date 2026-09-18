@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, ChevronDown, RefreshCcw, Search, GripVertical } from 'lucide-react';
+import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, Clock, ChevronDown, RefreshCcw, Search, GripVertical } from 'lucide-react';
 import subjectList from './data/subjects.json';
 import roomList from './data/rooms.json';
 import html2canvas from 'html2canvas';
@@ -12,6 +12,7 @@ import './index.css';
 import './planner.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const TIME_FORMAT_STORAGE_KEY = 'timetable_time_format_v1';
 
 // Timings: 0800 to 0000
 const timeSlots = [
@@ -81,6 +82,12 @@ export default function App() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [timeFormat, setTimeFormat] = useState(() => {
+    if (typeof window !== 'undefined' && window.localStorage.getItem(TIME_FORMAT_STORAGE_KEY) === '12h') {
+      return '12h';
+    }
+    return '24h';
+  });
   const gridRef = useRef(null);
   const wrapperRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -118,6 +125,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('timetable_subjects_v2', JSON.stringify(subjects));
   }, [subjects]);
+
+  useEffect(() => {
+    localStorage.setItem(TIME_FORMAT_STORAGE_KEY, timeFormat);
+  }, [timeFormat]);
 
   // Handle clicking outside custom dropdown
   useEffect(() => {
@@ -312,6 +323,10 @@ export default function App() {
       setSubjects([]);
       localStorage.removeItem('timetable_subjects_v2');
     }
+  };
+
+  const toggleTimeFormat = () => {
+    setTimeFormat(prevFormat => prevFormat === '24h' ? '12h' : '24h');
   };
 
   // ----- Drag and Drop Functions ----- //
@@ -837,6 +852,16 @@ export default function App() {
             <button type="button" className="btn planner-reset" onClick={handleReset}><RefreshCcw size={15} />Reset timetable</button>
             <p className="mobile-instruction"><GripVertical size={13} aria-hidden="true" />Hold and drag a class, or tap it then tap an empty slot.</p>
           </div>
+          <button
+            type="button"
+            className="btn btn-secondary time-format-toggle"
+            aria-label={`Switch to ${timeFormat === '24h' ? '12-hour' : '24-hour'} time`}
+            aria-pressed={timeFormat === '12h'}
+            title={`Switch to ${timeFormat === '24h' ? '12-hour' : '24-hour'} time`}
+            onClick={toggleTimeFormat}
+          >
+            <Clock size={16} />{timeFormat === '24h' ? '24-hour' : '12-hour'}
+          </button>
           <button className="btn btn-secondary calendar-save" onClick={exportICS}><Calendar size={16} />Save to Calendar</button>
         </div>
       </section>
@@ -845,6 +870,7 @@ export default function App() {
         <div
           className="timetable-grid"
           ref={gridRef}
+          data-time-format={timeFormat}
           style={{
             '--cols': timeSlots.length,
             ...Object.fromEntries(days.map((day, index) => [
@@ -857,9 +883,9 @@ export default function App() {
           <div className="header-cell" data-export-role="corner" style={{ gridColumn: 1, gridRow: 1 }}>
             Day \ Time
           </div>
-          {timeSlots.map((time, i) => (
+          {timeSlots.map((_, i) => (
             <div key={`header-${i}`} className="header-cell" data-time-index={i} style={{ gridColumn: i + 2, gridRow: 1 }}>
-              <span className="header-time-range" aria-label={time}>{formatTimeRange(i)}</span>
+              <span className="header-time-range" aria-label={formatTimeRange(i, timeFormat)}>{formatTimeRange(i, timeFormat)}</span>
             </div>
           ))}
 
@@ -922,7 +948,7 @@ export default function App() {
                   className="subject-item"
                   role="button"
                   tabIndex={0}
-                  aria-label={`${subject.name}, ${session.day}, ${formatHour(session.startIndex)} to ${formatHour(session.endIndex)}. Edit subject`}
+                  aria-label={`${subject.name}, ${session.day}, ${formatHour(session.startIndex, timeFormat)} to ${formatHour(session.endIndex, timeFormat)}. Edit subject`}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSubjectClick(e, subject); } }}
                   data-session-day-index={dayIdx}
                   data-session-start-index={session.startIndex}
@@ -1257,8 +1283,8 @@ export default function App() {
                             value={session.startIndex}
                             onChange={e => handleSessionChange(sIdx, 'startIndex', parseInt(e.target.value))}
                           >
-                            {timeSlots.map((t, i) => (
-                              <option key={`start-${i}`} value={i}>{t.split(' - ')[0]}</option>
+                            {timeSlots.map((_, i) => (
+                              <option key={`start-${i}`} value={i}>{formatHour(i, timeFormat)}</option>
                             ))}
                           </select>
                         </div>
@@ -1269,13 +1295,13 @@ export default function App() {
                             value={session.endIndex}
                             onChange={e => handleSessionChange(sIdx, 'endIndex', parseInt(e.target.value))}
                           >
-                            {timeSlots.map((t, i) => (
+                            {timeSlots.map((_, i) => (
                               <option
                                 key={`end-${i}`}
                                 value={i + 1}
                                 disabled={i + 1 <= session.startIndex}
                               >
-                                {t.split(' - ')[1]}
+                                {formatHour(i + 1, timeFormat)}
                               </option>
                             ))}
                           </select>

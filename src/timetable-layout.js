@@ -1,6 +1,16 @@
-export const formatHour = (index) => `${String((8 + Number(index)) % 24).padStart(2, '0')}:00`;
+export const formatHour = (index, timeFormat = '24h') => {
+  const hour = (8 + Number(index)) % 24;
 
-export const formatTimeRange = (index) => `${formatHour(index)}–${formatHour(Number(index) + 1)}`;
+  if (timeFormat === '12h') {
+    const meridiem = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:00 ${meridiem}`;
+  }
+
+  return `${String(hour).padStart(2, '0')}:00`;
+};
+
+export const formatTimeRange = (index, timeFormat = '24h') => `${formatHour(index, timeFormat)}–${formatHour(Number(index) + 1, timeFormat)}`;
 
 export const getSessionLayoutKey = (subjectId, sessionIndex) => `${subjectId}:${sessionIndex}`;
 

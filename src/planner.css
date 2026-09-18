@@ -27,6 +27,7 @@
 .planner-overview p { color: var(--text-muted); font-size: .75rem; margin-top: .5rem; }
 .planner-overview p span { margin: 0 .55rem; }
 .planner .calendar-save { font-size: .8rem; padding: .65rem .85rem; }
+.planner .time-format-toggle { font-size: .8rem; padding: .65rem .85rem; }
 .planner .timetable-wrapper { border-radius: 14px; box-shadow: 0 8px 24px -16px rgba(0,0,0,.5); margin-bottom: 0; }
 .planner .timetable-grid {
   --header-row-height: 46px;
@@ -41,6 +42,7 @@
     minmax(calc(var(--day-3-lanes, 1) * var(--session-lane-height)), auto)
     minmax(calc(var(--day-4-lanes, 1) * var(--session-lane-height)), auto);
 }
+.planner .timetable-grid[data-time-format="12h"] { grid-template-columns: 110px repeat(var(--cols, 16), minmax(110px, 1fr)); min-width: calc(110px + var(--cols, 16) * 110px); }
 .planner .header-cell { background: var(--panel-bg-alt); font-size: .75rem; font-variant-numeric: tabular-nums; border-right-color: rgba(51,65,85,.5); }
 .planner .header-time-range { font-size: .65rem; white-space: nowrap; }
 .planner .day-cell { background: var(--panel-bg-alt); justify-content: flex-start; padding: 1rem; font-size: .85rem; position: sticky; left: 0; z-index: 12; }
@@ -94,6 +96,7 @@
   .planner .calendar-save { font-size: .75rem; }
   .planner-footer { flex-direction: column; gap: .75rem; }
   .planner .timetable-grid { --header-row-height: 44px; --session-lane-height: 130px; grid-template-columns: 96px repeat(var(--cols, 16), 96px); min-width: calc(96px + var(--cols, 16) * 96px); }
+  .planner .timetable-grid[data-time-format="12h"] { grid-template-columns: 96px repeat(var(--cols, 16), 110px); min-width: calc(96px + var(--cols, 16) * 110px); }
   .planner .day-cell { padding: .75rem; font-size: .8rem; }
 }
 @media (prefers-reduced-motion: reduce) {
