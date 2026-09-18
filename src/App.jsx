@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import { buildSessionLayout, formatHour, formatTimeRange, getSessionLayoutKey } from './timetable-layout.js';
 import { isTapGesture } from './timetable-interactions.js';
 import { formatICSDateUtc } from './calendar-export.js';
+import { getSectionOptions } from './section-options.js';
+import { getMobileExportLayout } from './export-layout.js';
 import './index.css';
 import './planner.css';
 
@@ -27,8 +29,6 @@ const colors = [
   '#4267AC', '#6A4C93', '#F15BB5', '#F43F5E', '#06B6D4',
   '#10B981', '#D946EF'
 ];
-
-const sections = Array.from({ length: 50 }, (_, i) => `S${i + 1}`);
 
 const getGridPosition = (grid, x, y) => {
   const rect = grid.getBoundingClientRect();
@@ -253,6 +253,7 @@ export default function App() {
   const filteredSubjects = subjectList.filter(s =>
     s.toLowerCase().includes(subjectSearch.toLowerCase())
   ).slice(0, 50); // Limit to 50 for performance
+  const sectionOptions = getSectionOptions(formData.section);
 
   const handleSessionChange = (index, field, value) => {
     let newSessions = [...formData.sessions];
@@ -561,8 +562,9 @@ export default function App() {
     const maxCol = getExportMaxCol();
     const isPortrait = orientation === 'portrait';
     const isMobile = orientation === 'mobile';
+    const mobileExportLayout = getMobileExportLayout(timeFormat, days.length);
     const exportWidth = isMobile
-      ? 645
+      ? mobileExportLayout.exportWidth
       : isPortrait
       ? 125 + (days.length * 180)
       : 135 + (maxCol * 110);
@@ -591,8 +593,8 @@ export default function App() {
         clonedGrid.style.minWidth = `${exportWidth}px`;
 
         if (isPortrait || isMobile) {
-          const dayColumnWidth = isMobile ? 115 : 180;
-          const timeColumnWidth = isMobile ? 70 : 125;
+          const dayColumnWidth = isMobile ? mobileExportLayout.dayColumnWidth : 180;
+          const timeColumnWidth = isMobile ? mobileExportLayout.timeColumnWidth : 125;
           const rowHeight = isMobile ? mobileRowHeight : 135;
           clonedGrid.style.gridTemplateColumns = `${timeColumnWidth}px repeat(${days.length}, ${dayColumnWidth}px)`;
           clonedGrid.style.gridTemplateRows = `55px repeat(${maxCol}, ${rowHeight}px)`;
@@ -1105,12 +1107,12 @@ export default function App() {
                     />
                     {showSectionDropdown && (
                       <div className="subject-dropdown section-dropdown" ref={sectionDropdownRef}>
-                        {formData.section.trim() && (
+                        {sectionOptions.customValue && (
                           <div className="subject-option custom-entry" onClick={() => setShowSectionDropdown(false)}>
-                            <Plus size={14} className="mr-2" />Use custom: "{formData.section}"
+                            <Plus size={14} className="mr-2" />Use custom: "{sectionOptions.customValue}"
                           </div>
                         )}
-                        {sections.filter(section => section.toLowerCase().includes(formData.section.toLowerCase())).slice(0, 30).map(section => (
+                        {sectionOptions.options.map(section => (
                           <div key={section} className="subject-option" onClick={() => { setFormData({ ...formData, section }); setShowSectionDropdown(false); }}>
                             {section}
                           </div>

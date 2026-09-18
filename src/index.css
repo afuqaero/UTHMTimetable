@@ -1047,7 +1047,10 @@ select.form-control {
   right: 0;
   min-width: 180px;
   max-height: 220px;
-  overflow-y: auto;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 
 @media (max-width: 768px) {
