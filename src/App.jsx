@@ -562,7 +562,7 @@ export default function App() {
     const maxCol = getExportMaxCol();
     const isPortrait = orientation === 'portrait';
     const isMobile = orientation === 'mobile';
-    const mobileExportLayout = getMobileExportLayout(timeFormat, days.length);
+    const mobileExportLayout = getMobileExportLayout(days.length);
     const exportWidth = isMobile
       ? mobileExportLayout.exportWidth
       : isPortrait
