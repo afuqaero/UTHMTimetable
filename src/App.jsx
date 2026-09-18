@@ -7,6 +7,7 @@ import { jsPDF } from 'jspdf';
 import { Link } from 'react-router-dom';
 import { buildSessionLayout, formatHour, formatTimeRange, getSessionLayoutKey } from './timetable-layout.js';
 import { isTapGesture } from './timetable-interactions.js';
+import { formatICSDateUtc } from './calendar-export.js';
 import './index.css';
 import './planner.css';
 
@@ -746,7 +747,7 @@ export default function App() {
 
         icsContent += "BEGIN:VEVENT\r\n";
         icsContent += `UID:${generateId()}@uthmtimetable\r\n`;
-        icsContent += `DTSTAMP:${formatICSDate(now)}Z\r\n`; // Z implies UTC, but we just use it to pacify validators
+        icsContent += `DTSTAMP:${formatICSDateUtc(now)}\r\n`;
         icsContent += `DTSTART:${formatICSDate(eventStart)}\r\n`;
         icsContent += `DTEND:${formatICSDate(eventEnd)}\r\n`;
         icsContent += `RRULE:FREQ=WEEKLY;COUNT=14\r\n`; // Assumes 14 weeks typical semester length!
