@@ -84,16 +84,17 @@
   .planner .header-subtitle { font-size: .76rem; line-height: 1.5; max-width: 36rem; }
   .planner .desktop-instruction { display: none; }
   .planner .mobile-instruction { display: block; }
-  .planner-reset-group { position: relative; max-width: none; }
-  .planner-reset-group .mobile-instruction { display: flex; align-items: center; gap: .3rem; position: absolute; top: calc(100% + .35rem); left: 0; width: max-content; max-width: none; color: var(--text-muted); font-size: .62rem; line-height: 1.35; white-space: nowrap; }
+  .planner-reset-group { position: relative; flex: 1 1 100%; width: 100%; max-width: none; }
+  .planner-reset-group .mobile-instruction { display: flex; align-items: center; gap: .3rem; position: static; width: auto; max-width: 100%; margin: .35rem 0 0; color: var(--text-muted); font-size: .62rem; line-height: 1.35; white-space: normal; }
   .planner .header-actions { justify-content: flex-start; width: auto; }
   .planner .header-actions .btn { width: auto; padding: .65rem .9rem; }
   .planner .header-actions .hide-on-mobile { display: inline; }
   .planner .header-actions .dropdown-container > .btn { width: auto; }
   .planner-toolbar { align-items: flex-start; flex-direction: column; flex-wrap: wrap; }
   .planner-toolbar { margin-bottom: 2rem; }
-  .planner-toolbar-actions { width: auto; justify-content: flex-start; }
-  .planner .calendar-save { font-size: .75rem; }
+  .planner-toolbar-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: .5rem; }
+  .planner-toolbar-actions .time-format-toggle,
+  .planner-toolbar-actions .calendar-save { flex: 1 1 0; min-width: 0; justify-content: center; font-size: .75rem; }
   .planner-footer { flex-direction: column; gap: .75rem; }
   .planner .timetable-grid { --header-row-height: 44px; --session-lane-height: 130px; grid-template-columns: 96px repeat(var(--cols, 16), 96px); min-width: calc(96px + var(--cols, 16) * 96px); }
   .planner .timetable-grid[data-time-format="12h"] { grid-template-columns: 96px repeat(var(--cols, 16), 110px); min-width: calc(96px + var(--cols, 16) * 110px); }
