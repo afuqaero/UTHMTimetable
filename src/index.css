@@ -455,6 +455,47 @@ h1:hover {
   color: var(--text-main);
 }
 
+.share-dialog-content {
+  max-width: 720px;
+}
+
+.share-dialog-body {
+  padding-bottom: 1.75rem;
+}
+
+.share-dialog-hint,
+.share-privacy-note {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.share-dialog-hint {
+  margin-bottom: 1rem;
+}
+
+.share-link-row {
+  display: flex;
+  gap: .65rem;
+  align-items: stretch;
+}
+
+.share-link-input {
+  min-width: 0;
+  font-size: .8rem;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.share-copy-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.share-privacy-note {
+  margin-top: .8rem;
+  font-size: .75rem;
+}
+
 .close-button {
   background: none;
   border: none;
@@ -895,6 +936,14 @@ select.form-control {
 
   .modal-body {
     padding: 1rem;
+  }
+
+  .share-link-row {
+    flex-direction: column;
+  }
+
+  .share-copy-button {
+    width: 100%;
   }
 
   .modal-header,

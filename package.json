@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "sync:uthm": "node ./scripts/sync-uthm-timetable.mjs",
-    "test:timetable-layout": "node --test tests/timetable-layout.test.mjs tests/calendar-export.test.mjs tests/mobile-layout.test.mjs tests/section-dropdown.test.mjs tests/export-layout.test.mjs",
+    "test:timetable-layout": "node --test tests/timetable-layout.test.mjs tests/calendar-export.test.mjs tests/mobile-layout.test.mjs tests/section-dropdown.test.mjs tests/export-layout.test.mjs tests/share-state.test.mjs",
     "test:uthm-sync": "node --test tests/uthm-sync.test.mjs tests/uthm-sync.generated.test.mjs",
     "test:uthm-sync:live": "node --test tests/uthm-sync.live.test.mjs"
   },

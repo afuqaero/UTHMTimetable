@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, Clock, ChevronDown, RefreshCcw, Search, GripVertical } from 'lucide-react';
+import { Plus, X, Trash2, MapPin, User, Download, Image as ImageIcon, Calendar, Clock, ChevronDown, RefreshCcw, Search, GripVertical, Share2, Copy } from 'lucide-react';
 import subjectList from './data/subjects.json';
 import roomList from './data/rooms.json';
 import html2canvas from 'html2canvas';
@@ -10,6 +10,7 @@ import { isTapGesture } from './timetable-interactions.js';
 import { formatICSDateUtc } from './calendar-export.js';
 import { getSectionOptions } from './section-options.js';
 import { getMobileExportLayout } from './export-layout.js';
+import { createTimetableShareUrl, readTimetableFromLocation, SHARE_QUERY_PARAM } from './share-state.js';
 import './index.css';
 import './planner.css';
 
@@ -65,7 +66,12 @@ const escapeICSText = (value) => String(value ?? '')
   .replace(/,/g, '\\,');
 
 export default function App() {
+  const sharedTimetable = useMemo(() => (
+    typeof window !== 'undefined' ? readTimetableFromLocation() : null
+  ), []);
   const [subjects, setSubjects] = useState(() => {
+    if (sharedTimetable) return sharedTimetable.subjects;
+
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('timetable_subjects_v2');
       if (saved) {
@@ -83,6 +89,8 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [timeFormat, setTimeFormat] = useState(() => {
+    if (sharedTimetable) return sharedTimetable.timeFormat;
+
     if (typeof window !== 'undefined' && window.localStorage.getItem(TIME_FORMAT_STORAGE_KEY) === '12h') {
       return '12h';
     }
@@ -92,6 +100,9 @@ export default function App() {
   const wrapperRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [draggedItem, setDraggedItem] = useState(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [shareCopied, setShareCopied] = useState(false);
 
   // Form state
   const [editingId, setEditingId] = useState(null); // ID of subject being edited
@@ -129,6 +140,16 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(TIME_FORMAT_STORAGE_KEY, timeFormat);
   }, [timeFormat]);
+
+  // Consume a shared snapshot once, then remove it from the address bar so a refresh
+  // continues with the latest local edits instead of re-importing the old snapshot.
+  useEffect(() => {
+    if (!sharedTimetable || typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete(SHARE_QUERY_PARAM);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  }, [sharedTimetable]);
 
   // Handle clicking outside custom dropdown
   useEffect(() => {
@@ -328,6 +349,38 @@ export default function App() {
 
   const toggleTimeFormat = () => {
     setTimeFormat(prevFormat => prevFormat === '24h' ? '12h' : '24h');
+  };
+
+  const copyShareLink = async (url) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+    } catch {
+      setShareCopied(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = createTimetableShareUrl(subjects, timeFormat);
+    setShareLink(url);
+    setShareCopied(false);
+    setShareDialogOpen(true);
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'UTHM Timetable Planner',
+          text: 'Continue editing this timetable',
+          url,
+        });
+        setShareDialogOpen(false);
+      } catch (error) {
+        // Closing the native share sheet is not an error; keep the link dialog open.
+        if (error?.name !== 'AbortError') await copyShareLink(url);
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await copyShareLink(url);
+    }
   };
 
   // ----- Drag and Drop Functions ----- //
@@ -834,6 +887,15 @@ export default function App() {
             )}
           </div>
           <button
+            className="btn btn-secondary"
+            aria-label="Share timetable"
+            title="Share timetable"
+            onClick={handleShare}
+          >
+            <Share2 size={18} />
+            <span className="hide-on-mobile">Share Timetable</span>
+          </button>
+          <button
             className="btn btn-primary add-subject-btn"
             aria-label="Add subject"
             onClick={() => openNewSubjectModal()}
@@ -1031,7 +1093,40 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Subject Form Modal */}
+      {/* Share dialog */}
+      {shareDialogOpen && (
+        <div className="modal-overlay" onMouseDown={() => setShareDialogOpen(false)}>
+          <div className="modal-content share-dialog-content" onMouseDown={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Continue on another device</h2>
+              <button className="close-button" aria-label="Close share dialog" onClick={() => setShareDialogOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body share-dialog-body">
+              <p className="share-dialog-hint">
+                Open or send this link on your tablet or desktop to continue editing this timetable. The link captures the current version, so create a new one after making more changes.
+              </p>
+              <div className="share-link-row">
+                <input
+                  className="form-control share-link-input"
+                  value={shareLink}
+                  readOnly
+                  onFocus={e => e.target.select()}
+                  aria-label="Timetable share link"
+                />
+                <button className="btn btn-primary share-copy-button" onClick={() => copyShareLink(shareLink)}>
+                  <Copy size={16} />
+                  {shareCopied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <p className="share-privacy-note">Anyone with this link can view and edit a copy of the timetable data in it.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subject form modal */}
       {modalOpen && (
         <div className="modal-overlay" onMouseDown={closeSubjectModal}>
           <div className="modal-content" onMouseDown={e => {
