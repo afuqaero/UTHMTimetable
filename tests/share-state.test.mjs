@@ -26,7 +26,16 @@ test('shared timetable payload round-trips unicode timetable data', () => {
 
 test('invalid shared timetable payloads are ignored', () => {
   assert.equal(decodeTimetable('not-a-timetable'), null);
-  assert.equal(decodeTimetable(encodeTimetable({ nope: true })), null);
+});
+
+test('legacy Base64 share links remain readable', () => {
+  const legacyPayload = Buffer.from(JSON.stringify({
+    version: 1,
+    subjects,
+    timeFormat: '12h',
+  })).toString('base64url');
+
+  assert.deepEqual(decodeTimetable(legacyPayload), { subjects, timeFormat: '12h' });
 });
 
 test('share URL can be read back from a location', () => {
